@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>หน่วยที่ 2: อุปกรณ์เครือข่ายคอมพิวเตอร์ | สื่อการเรียนรู้ออนไลน์</title>
+    <link rel="icon" type="image/png" href="image/logo.png">
+    <link rel="apple-touch-icon" href="image/logo.png">
     
     <!-- Google Fonts: Kanit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -119,7 +121,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-cyan-500 selection:text-white relative">
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-cyan-500 selection:text-white relative pb-14 sm:pb-12">
 
     <!-- Top Navigation Bar -->
     <header class="bg-white/95 backdrop-blur-md text-slate-800 sticky top-0 z-50 shadow-md border-b border-slate-200/80 w-full">
@@ -131,16 +133,14 @@
                 </button>
                 
                 <a href="index.html" class="flex items-center space-x-2.5 group">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-500 p-0.5 shadow-md flex items-center justify-center shrink-0">
-                        <div class="w-full h-full rounded-full bg-slate-900 flex items-center justify-center overflow-hidden border border-white">
-                            <i class="fa-solid fa-user-tie text-cyan-300 text-lg"></i>
-                        </div>
+                    <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-500 p-0.5 shadow-md flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <img src="image/logo.png" alt="NiceKung Logo" class="w-full h-full rounded-full object-cover border border-white/80 bg-slate-900 shadow-inner">
                     </div>
                     <div>
                         <h1 class="font-extrabold text-sm sm:text-base text-slate-900 leading-tight">
                             CHAITHAWAT <span class="text-xs text-blue-600 font-semibold hidden sm:inline">| SRISAENWORAKUN</span>
                         </h1>
-                        <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium">Computer Network and Security Learning Hub</p>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium">NiceKung • Computer Network & Security Learning Hub</p>
                     </div>
                 </a>
             </div>
@@ -168,8 +168,12 @@
             </nav>
 
             <div class="flex items-center space-x-2">
-                <a href="unit3.html" class="bg-gradient-to-r from-cyan-600 to-blue-500 hover:from-cyan-700 hover:to-blue-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-full transition-all shadow-md flex items-center gap-1.5 active:scale-95">
-                    <span>บทถัดไป (Unit 3)</span>
+                <a href="unit1.html" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                    <span>ก่อนหน้า</span>
+                </a>
+                <a href="unit3.html" class="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white text-xs font-semibold px-3.5 py-1.5 rounded-full transition-all shadow-md flex items-center gap-1.5 active:scale-95">
+                    <span>ถัดไป</span>
                     <i class="fa-solid fa-chevron-right text-xs"></i>
                 </a>
             </div>
@@ -181,7 +185,10 @@
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-slate-900 text-white flex flex-col justify-between z-50 shadow-2xl border-r border-slate-800 overflow-y-auto transform -translate-x-full transition-transform duration-300 ease-in-out">
         <div class="p-5">
             <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
-                <span class="text-xs font-bold text-cyan-400 tracking-wider uppercase"><i class="fa-solid fa-compass mr-1"></i> เมนูบทเรียน</span>
+                <div class="flex items-center space-x-2.5">
+                    <img src="image/logo.png" alt="NiceKung Logo" class="w-8 h-8 rounded-full border border-cyan-400/60 object-cover bg-slate-950">
+                    <span class="text-xs font-bold text-cyan-400 tracking-wider uppercase">เมนูบทเรียน</span>
+                </div>
                 <button onclick="toggleSidebar()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
@@ -215,7 +222,8 @@
             </nav>
         </div>
         <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-400">
-            <p class="text-[10px] text-slate-500 text-center">© 2026 Chaithawat Srisaenworakun</p>
+            <p class="text-[10px] text-slate-400 text-center font-medium">ครูชัยธวัฒน์ ศรีแสนวรกุล (ครูไนท์)</p>
+            <p class="text-[9px] text-slate-600 text-center mt-0.5">© 2026 Chaithawat Srisaenworakun</p>
         </div>
     </aside>
 
@@ -813,10 +821,17 @@
 
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-white py-8 px-4 text-xs text-center border-t border-slate-800">
-        <p>© 2026 Chaithawat Srisaenworakun. All rights reserved.</p>
-        <p class="text-slate-500 text-[11px] mt-1">Computer Network and Security Learning Platform for Google Sites</p>
+    <!-- Fixed Bottom Copyright Footer -->
+    <footer class="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-slate-800/90 py-2.5 px-4 shadow-[0_-4px_25px_rgba(0,0,0,0.5)]">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-[11px] sm:text-xs text-slate-400">
+            <p class="flex items-center gap-1.5 text-center sm:text-left">
+                <i class="fa-regular fa-copyright text-cyan-400"></i>
+                <span>2026 สื่อการเรียนรู้ออนไลน์ พัฒนาโดย <strong class="text-white font-medium">ครูชัยธวัฒน์ ศรีแสนวรกุล (ครูไนท์)</strong></span>
+            </p>
+            <p class="text-slate-500 text-[10px] sm:text-[11px]">
+                Computer Network & Cyber Security Learning Platform
+            </p>
+        </div>
     </footer>
 
     <!-- Scripts -->
