@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>หน่วยที่ 4: การเข้าสายแลนเชื่อมต่อระบบเครือข่าย | สื่อการเรียนรู้ออนไลน์</title>
+    
+    <!-- Google Fonts: Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons 6.5.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Kanit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                            dark: '#0a192f'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #fffdf5;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .bg-grid-cyber {
+            background-image: 
+                linear-gradient(to right, rgba(217, 119, 6, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(217, 119, 6, 0.06) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        .unit-hero {
+            background: linear-gradient(135deg, #78350f 0%, #b45309 40%, #0284c7 100%);
+        }
+
+        .content-box {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px -4px rgba(217, 119, 6, 0.08);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+        }
+        .content-box:hover {
+            box-shadow: 0 16px 32px -8px rgba(217, 119, 6, 0.18);
+        }
+
+        .quiz-option {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+        .quiz-option:hover {
+            border-color: #d97706;
+            background-color: #fffbeb;
+            transform: translateX(4px);
+        }
+        .quiz-option:has(input:checked) {
+            border-color: #d97706;
+            background-color: #fef3c7;
+            box-shadow: 0 4px 12px -2px rgba(217, 119, 6, 0.2);
+            transform: translateX(6px);
+        }
+
+        .wire-strip {
+            height: 18px;
+            border-radius: 4px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease;
+        }
+        .wire-strip:hover {
+            transform: scaleY(1.15);
+        }
+
+        /* Scroll reveal */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .reveal-on-scroll.is-revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop-in {
+            animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, ::before, ::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .reveal-on-scroll {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-amber-500 selection:text-white relative">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-white/95 backdrop-blur-md text-slate-800 sticky top-0 z-50 shadow-md border-b border-slate-200/80 w-full">
+        <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
+            
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-xl bg-slate-100 text-amber-600 hover:bg-amber-50 transition-all border border-slate-200">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                
+                <a href="index.html" class="flex items-center space-x-2.5 group">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-600 to-cyan-500 p-0.5 shadow-md flex items-center justify-center shrink-0">
+                        <div class="w-full h-full rounded-full bg-slate-900 flex items-center justify-center overflow-hidden border border-white">
+                            <i class="fa-solid fa-user-tie text-amber-400 text-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-sm sm:text-base text-slate-900 leading-tight">
+                            CHAITHAWAT <span class="text-xs text-amber-600 font-semibold hidden sm:inline">| SRISAENWORAKUN</span>
+                        </h1>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium">Computer Network and Security Learning Hub</p>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="hidden lg:flex items-center space-x-1 font-medium text-xs">
+                <a href="index.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-amber-600 hover:bg-amber-50/80 transition-all">
+                    <span>Home</span>
+                </a>
+                <a href="unit1.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-amber-600 hover:bg-amber-50/80 transition-all">
+                    <span>รู้จักเครือข่ายคอมพิวเตอร์</span>
+                </a>
+                <a href="unit2.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-amber-600 hover:bg-amber-50/80 transition-all">
+                    <span>อุปกรณ์เครือข่าย</span>
+                </a>
+                <a href="unit3.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-amber-600 hover:bg-amber-50/80 transition-all">
+                    <span>การรับส่งข้อมูล</span>
+                </a>
+                <a href="unit4.html" class="px-3.5 py-2 rounded-xl bg-amber-600 text-white font-semibold shadow-sm transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-ethernet text-xs"></i>
+                    <span>การเข้าสายแลน</span>
+                </a>
+                <a href="unit5.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-amber-600 hover:bg-amber-50/80 transition-all">
+                    <span>ความปลอดภัย</span>
+                </a>
+            </nav>
+
+            <div class="flex items-center space-x-2">
+                <a href="unit5.html" class="bg-gradient-to-r from-amber-600 to-rose-500 hover:from-amber-700 hover:to-rose-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-full transition-all shadow-md flex items-center gap-1.5 active:scale-95">
+                    <span>บทถัดไป (Unit 5)</span>
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Off-Canvas Sidebar -->
+    <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 hidden transition-opacity"></div>
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-slate-900 text-white flex flex-col justify-between z-50 shadow-2xl border-r border-slate-800 overflow-y-auto transform -translate-x-full transition-transform duration-300 ease-in-out">
+        <div class="p-5">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
+                <span class="text-xs font-bold text-cyan-400 tracking-wider uppercase"><i class="fa-solid fa-compass mr-1"></i> เมนูบทเรียน</span>
+                <button onclick="toggleSidebar()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <nav class="space-y-1.5 text-xs font-medium">
+                <a href="index.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all">
+                    <i class="fa-solid fa-house w-5 text-center"></i>
+                    <span>หน้าหลัก (Home)</span>
+                </a>
+                <a href="unit1.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition-all">
+                    <i class="fa-solid fa-diagram-project text-blue-400 w-5 text-center"></i>
+                    <span>1. รู้จักเครือข่ายคอมพิวเตอร์</span>
+                </a>
+                <a href="unit2.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition-all">
+                    <i class="fa-solid fa-server text-cyan-400 w-5 text-center"></i>
+                    <span>2. อุปกรณ์เครือข่ายคอมพิวเตอร์</span>
+                </a>
+                <a href="unit3.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition-all">
+                    <i class="fa-solid fa-right-left text-emerald-400 w-5 text-center"></i>
+                    <span>3. การรับส่งข้อมูลบนเครือข่าย</span>
+                </a>
+                <a href="unit4.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl bg-amber-600 text-white shadow-md">
+                    <i class="fa-solid fa-ethernet text-amber-200 w-5 text-center"></i>
+                    <span>4. การเข้าสายแลนเชื่อมต่อระบบ</span>
+                </a>
+                <a href="unit5.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition-all">
+                    <i class="fa-solid fa-shield-halved text-rose-400 w-5 text-center"></i>
+                    <span>5. ความปลอดภัยบนระบบเครือข่าย</span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-400">
+            <p class="text-[10px] text-slate-500 text-center">© 2026 Chaithawat Srisaenworakun</p>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="w-full flex-1 bg-grid-cyber pb-16">
+        
+        <!-- Unit Hero Banner -->
+        <section class="max-w-7xl mx-auto px-4 pt-4 pb-6">
+            <div class="unit-hero text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden border border-amber-400/30">
+                <div class="relative z-10 max-w-3xl">
+                    <div class="flex items-center space-x-2 text-xs text-amber-200 mb-3">
+                        <a href="index.html" class="hover:underline flex items-center gap-1"><i class="fa-solid fa-house"></i> หน้าหลัก</a>
+                        <span>/</span>
+                        <span class="text-white font-semibold">หน่วยที่ 4</span>
+                    </div>
+
+                    <span class="inline-block bg-amber-500/40 border border-amber-300/40 text-amber-100 text-xs font-bold px-3 py-1 rounded-full mb-3">
+                        UNIT 04 • ปฏิบัติการติดตั้งสายสัญญาณ
+                    </span>
+                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-md">
+                        การเข้าสายแลนเชื่อมต่อระบบ
+                    </h1>
+                    <p class="text-base sm:text-lg text-amber-100 mt-2 font-light">
+                        LAN Cable Crimping, RJ-45 Standards (T568A / T568B) and Cable Testing
+                    </p>
+                    
+                    <div class="mt-5 flex flex-wrap items-center gap-4 text-xs text-amber-100/90 pt-3 border-t border-amber-300/20">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock text-amber-300"></i> เวลาเรียน: 3 ชั่วโมง (ปฏิบัติ)</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-brands fa-youtube text-red-400"></i> วิดีโอสาธิต</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-wrench text-amber-300"></i> 6 ขั้นตอนปฏิบัติ</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-graduation-cap text-amber-300"></i> สรุปสาระสำคัญ</span>
+                    </div>
+                </div>
+
+                <i class="fa-solid fa-ethernet absolute -right-6 -bottom-8 text-[220px] text-amber-400/10 pointer-events-none"></i>
+            </div>
+        </section>
+
+        <!-- Learning Objectives Card -->
+        <section class="max-w-7xl mx-auto px-4 mb-8">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border-2 border-amber-200">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center text-lg shadow-md">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">จุดประสงค์การเรียนรู้</h2>
+                        <p class="text-xs text-amber-700">เมื่อศึกษาหน่วยนี้แล้ว ผู้เรียนจะมีความรู้ความสามารถดังนี้</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700">
+                    <div class="flex items-start space-x-3 bg-amber-50/60 p-3.5 rounded-2xl border border-amber-100">
+                        <i class="fa-solid fa-circle-check text-amber-600 text-base mt-0.5 shrink-0"></i>
+                        <span>1. อธิบายมาตรฐานการเรียงสีสายแลนแบบ T568A และ T568B ได้อย่างถูกต้อง</span>
+                    </div>
+                    <div class="flex items-start space-x-3 bg-amber-50/60 p-3.5 rounded-2xl border border-amber-100">
+                        <i class="fa-solid fa-circle-check text-amber-600 text-base mt-0.5 shrink-0"></i>
+                        <span>2. ใช้อุปกรณ์เครื่องมือช่าง (คีมย้ำหัว RJ-45, มีดปอกสาย, ตัวทดสอบสาย) ได้อย่างปลอดภัยและชำนาญ</span>
+                    </div>
+                    <div class="flex items-start space-x-3 bg-amber-50/60 p-3.5 rounded-2xl border border-amber-100">
+                        <i class="fa-solid fa-circle-check text-amber-600 text-base mt-0.5 shrink-0"></i>
+                        <span>3. ปฏิบัติการเข้าหัวสาย UTP กับหัว RJ-45 แบบสายตรง (Straight-Through) ได้ตามเกณฑ์มาตรฐาน</span>
+                    </div>
+                    <div class="flex items-start space-x-3 bg-amber-50/60 p-3.5 rounded-2xl border border-amber-100">
+                        <i class="fa-solid fa-circle-check text-amber-600 text-base mt-0.5 shrink-0"></i>
+                        <span>4. ตรวจสอบความถูกต้องและความต่อเนื่องของสัญญาณด้วยเครื่อง Network Cable Tester ได้</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Learning Section (YouTube Embed) -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border-2 border-amber-300 bg-gradient-to-b from-amber-50/40 via-white to-orange-50/20 shadow-lg">
+                <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-200 mb-6 gap-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-500 text-white flex items-center justify-center text-xl shadow-md shadow-red-500/20">
+                            <i class="fa-brands fa-youtube"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-black text-slate-900">วิดีโอสาธิตปฏิบัติการ: การเข้าหัวสายแลน RJ-45 ด้วยตัวเอง</h3>
+                            <p class="text-xs text-amber-800">ชมคลิปสาธิตขั้นตอนการปอกสาย จัดเรียงสี และย้ำหัว RJ-45 แบบเข้าใจง่ายภายในไม่กี่นาที</p>
+                        </div>
+                    </div>
+                    <span class="self-start md:self-auto text-xs bg-red-100 text-red-700 font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-red-200">
+                        <i class="fa-solid fa-play text-[10px]"></i> คลิปสาธิตปฏิบัติการ
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <!-- Responsive YouTube Embed -->
+                    <div class="lg:col-span-8">
+                        <div class="relative w-full rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-slate-900" style="padding-top: 56.25%;">
+                            <iframe 
+                                class="absolute top-0 left-0 w-full h-full"
+                                src="https://www.youtube.com/embed/7zd0oycQrHA" 
+                                title="การเข้าหัวสายแลน RJ45 ด้วยตัวเองแบบง่ายๆ" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                referrerpolicy="strict-origin-when-cross-origin"
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        <div class="mt-3 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-amber-100 text-xs text-slate-500">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-info text-amber-600"></i> หากมีข้อจำกัดด้านเบราว์เซอร์หรือเครื่องขัดข้อง สามารถเปิดดูผ่าน YouTube ได้โดยตรง:</span>
+                            <a href="https://www.youtube.com/watch?v=7zd0oycQrHA" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white font-bold px-3.5 py-1.5 rounded-xl shadow transition-all active:scale-95 text-xs">
+                                <i class="fa-brands fa-youtube"></i>
+                                <span>เปิดดูบน YouTube</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Video Highlights & Guide -->
+                    <div class="lg:col-span-4 space-y-3.5 text-xs sm:text-sm">
+                        <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm space-y-2">
+                            <h4 class="font-bold text-slate-900 flex items-center gap-2 text-sm">
+                                <i class="fa-solid fa-lightbulb text-amber-500"></i> เทคนิคสำคัญจากการสาธิต:
+                            </h4>
+                            <ul class="space-y-2 text-slate-600 text-xs">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-play text-red-500 mt-0.5 shrink-0"></i>
+                                    <span>การปอกเปลือกนอก ~2.5 ซม. โดยไม่ให้ใบมีดบาดสายใน</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-play text-red-500 mt-0.5 shrink-0"></i>
+                                    <span>การรีดดัดสายให้ตรงและเรียงสี T568B ให้แบนระนาบ</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-play text-red-500 mt-0.5 shrink-0"></i>
+                                    <span>การตัดปลายให้ฉากเสมอ และดันเข้าหัว RJ-45 จนสุด</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="p-4 bg-gradient-to-br from-slate-900 via-amber-950 to-orange-950 text-white rounded-2xl shadow-md space-y-1 border border-amber-500/30">
+                            <div class="flex items-center gap-2 text-amber-300 font-bold text-xs">
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                                <span>คำแนะนำสำหรับผู้เรียน</span>
+                            </div>
+                            <p class="text-[11px] text-slate-200 leading-relaxed">
+                                แนะนำให้ฝึกปฏิบัติจริงควบคู่กับคู่มือขั้นตอนอย่างละเอียดในหัวข้อ 4.5 เพื่อเสริมทักษะความชำนาญในการต่อสาย
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 1: Twisted Pair Cable Categories & Shielding -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-amber-600 text-white font-bold flex items-center justify-center text-sm shadow-md">4.1</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">ประเภทสายสัญญาณคู่บิดเกลียว (Twisted Pair Categories & Shielding)</h3>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center mb-6">
+                    <div class="lg:col-span-7 space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        <p>
+                            <strong class="text-slate-900 font-bold">สายคู่บิดเกลียว (Twisted Pair Cable)</strong> คือ สายสัญญาณที่มีตัวนำทองแดง 8 เส้น บิดเกลียวคู่กันเป็น 4 คู่ เหตุผลที่ต้องบิดเป็นเกลียว (Twist) เพื่อ <strong>ลดการรบกวนของสัญญาณแม่เหล็กไฟฟ้า (EMI - Electromagnetic Interference)</strong> และลดสัญญาณรบกวนข้ามคู่สาย (Crosstalk)
+                        </p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div class="bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200">
+                                <strong class="text-amber-950 block mb-1">UTP (Unshielded Twisted Pair)</strong>
+                                <p class="text-slate-600">สายไม่มีฟอยล์หุ้ม ยืดหยุ่นสูง ดัดโค้งง่าย ราคาประหยัด นิยมใช้ในอาคารและบ้านพักอาศัยทั่วไป</p>
+                            </div>
+                            <div class="bg-blue-50/70 p-3.5 rounded-2xl border border-blue-200">
+                                <strong class="text-blue-950 block mb-1">STP / SFTP (Shielded Twisted Pair)</strong>
+                                <p class="text-slate-600">มีแผ่นฟอยล์หรือตาข่ายโลหะหุ้ม ป้องกันคลื่นรบกวนภายนอกได้ยอดเยี่ยม นิยมใช้ในโรงงานอุตสาหกรรมหรือเดินคู่กับสายไฟแรงสูง</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Table -->
+                    <div class="lg:col-span-5 overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-amber-600 text-white">
+                                    <th class="p-2.5 rounded-tl-xl">Category</th>
+                                    <th class="p-2.5">Bandwidth</th>
+                                    <th class="p-2.5">ความเร็วสูงสุด</th>
+                                    <th class="p-2.5 rounded-tr-xl">ระยะทาง</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
+                                <tr>
+                                    <td class="p-2.5 font-bold text-slate-900">Cat 5e</td>
+                                    <td class="p-2.5 font-mono">100 MHz</td>
+                                    <td class="p-2.5 font-semibold text-blue-700">1 Gbps (1000BASE-T)</td>
+                                    <td class="p-2.5">100 เมตร</td>
+                                </tr>
+                                <tr class="bg-amber-50/40">
+                                    <td class="p-2.5 font-bold text-amber-900">Cat 6 ★</td>
+                                    <td class="p-2.5 font-mono">250 MHz</td>
+                                    <td class="p-2.5 font-bold text-emerald-700">10 Gbps (ระยะ 55m)</td>
+                                    <td class="p-2.5">100 เมตร (1Gbps)</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-bold text-slate-900">Cat 6A</td>
+                                    <td class="p-2.5 font-mono">500 MHz</td>
+                                    <td class="p-2.5 font-bold text-emerald-700">10 Gbps (ระยะ 100m)</td>
+                                    <td class="p-2.5">100 เมตร</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-bold text-slate-900">Cat 7 / Cat 8</td>
+                                    <td class="p-2.5 font-mono">600 - 2000 MHz</td>
+                                    <td class="p-2.5 font-bold text-purple-700">25 - 40 Gbps</td>
+                                    <td class="p-2.5">30 เมตร (Data Center)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 2: T568A vs T568B Color Coding Standards -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-amber-600 text-white font-bold flex items-center justify-center text-sm shadow-md">4.2</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">มาตรฐานการเรียงสีสายสัญญาณ (TIA/EIA-568A และ TIA/EIA-568B)</h3>
+                </div>
+
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+                    การเรียงสีสายแลน UTP มี 2 มาตรฐานหลักที่กำหนดโดยสมาคมอุตสาหกรรมโทรคมนาคม (TIA/EIA) เมื่อหันหัว RJ-45 คว่ำเขี้ยวล็อคลงด้านล่าง แล้วมองจาก <strong>ซ้ายไปขวา (Pin 1 ถึง Pin 8)</strong>:
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 text-xs sm:text-sm">
+                    <!-- T568A -->
+                    <div class="p-5 bg-emerald-50/40 rounded-2xl border-2 border-emerald-300 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-black text-base text-emerald-950">มาตรฐาน T568A</h4>
+                                <p class="text-xs text-emerald-700">มาตรฐานสากลเดิม / สายราชการ</p>
+                            </div>
+                            <span class="text-xs bg-emerald-200 text-emerald-900 px-3 py-1 rounded-full font-bold">Standard A</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5 text-center font-bold text-[11px]">
+                            <div class="p-2 rounded-xl bg-white border border-emerald-500 text-emerald-700 shadow-sm">1. ขาวเขียว</div>
+                            <div class="p-2 rounded-xl bg-emerald-600 text-white shadow-sm">2. เขียว</div>
+                            <div class="p-2 rounded-xl bg-white border border-amber-500 text-amber-700 shadow-sm">3. ขาวส้ม</div>
+                            <div class="p-2 rounded-xl bg-blue-600 text-white shadow-sm">4. น้ำเงิน</div>
+                            <div class="p-2 rounded-xl bg-white border border-blue-500 text-blue-700 shadow-sm">5. ขาวน้ำเงิน</div>
+                            <div class="p-2 rounded-xl bg-amber-500 text-white shadow-sm">6. ส้ม</div>
+                            <div class="p-2 rounded-xl bg-white border border-amber-800 text-amber-900 shadow-sm">7. ขาวน้ำตาล</div>
+                            <div class="p-2 rounded-xl bg-amber-900 text-white shadow-sm">8. น้ำตาล</div>
+                        </div>
+                        <p class="text-[11px] text-slate-500">สังเกต: คู่สีเขียวอยู่ที่ Pin 1, 2 และคู่สีส้มอยู่ที่ Pin 3, 6</p>
+                    </div>
+
+                    <!-- T568B (Standard) -->
+                    <div class="p-5 bg-amber-50/60 rounded-2xl border-2 border-amber-400 space-y-4 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-black text-base text-amber-950">มาตรฐาน T568B (นิยมใช้มากที่สุดในโลก ★)</h4>
+                                <p class="text-xs text-amber-700">มาตรฐานเชิงพาณิชย์และระบบแลนปัจจุบัน</p>
+                            </div>
+                            <span class="text-xs bg-amber-200 text-amber-900 px-3 py-1 rounded-full font-bold">Standard B</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5 text-center font-bold text-[11px]">
+                            <div class="p-2 rounded-xl bg-white border border-amber-500 text-amber-700 shadow-sm">1. ขาวส้ม</div>
+                            <div class="p-2 rounded-xl bg-amber-500 text-white shadow-sm">2. ส้ม</div>
+                            <div class="p-2 rounded-xl bg-white border border-emerald-500 text-emerald-700 shadow-sm">3. ขาวเขียว</div>
+                            <div class="p-2 rounded-xl bg-blue-600 text-white shadow-sm">4. น้ำเงิน</div>
+                            <div class="p-2 rounded-xl bg-white border border-blue-500 text-blue-700 shadow-sm">5. ขาวน้ำเงิน</div>
+                            <div class="p-2 rounded-xl bg-emerald-600 text-white shadow-sm">6. เขียว</div>
+                            <div class="p-2 rounded-xl bg-white border border-amber-800 text-amber-900 shadow-sm">7. ขาวน้ำตาล</div>
+                            <div class="p-2 rounded-xl bg-amber-900 text-white shadow-sm">8. น้ำตาล</div>
+                        </div>
+                        <p class="text-[11px] text-amber-800 font-semibold">สังเกต: คู่สีส้มอยู่ที่ Pin 1, 2 และคู่สีเขียวอยู่ที่ Pin 3, 6 (สลับตำแหน่งกับแบบ A)</p>
+                    </div>
+                </div>
+
+                <!-- Pinout Function Table -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <h4 class="font-bold text-slate-900 text-xs sm:text-sm mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-list-ol text-amber-600"></i> หน้าที่ของแต่ละพิน (10/100/1000 Mbps Ethernet):
+                    </h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-slate-700">
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                            <strong>Pin 1 & 2:</strong> Tx+ / Tx- (ส่งสัญญาณ)
+                        </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                            <strong>Pin 3 & 6:</strong> Rx+ / Rx- (รับสัญญาณ)
+                        </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                            <strong>Pin 4 & 5:</strong> Bi-directional / PoE
+                        </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                            <strong>Pin 7 & 8:</strong> Bi-directional / PoE
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 3: Straight-Through vs Crossover vs Rollover -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-amber-600 text-white font-bold flex items-center justify-center text-sm shadow-md">4.3</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">รูปแบบการเข้าสาย: สายตรง (Straight-Through) vs สายไขว้ (Crossover)</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 text-xs sm:text-sm">
+                    <!-- Straight-Through -->
+                    <div class="bg-blue-50/50 p-5 rounded-2xl border-2 border-blue-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-black text-blue-950 text-base">1. สายตรง (Straight-Through Cable)</h4>
+                                <span class="text-xs bg-blue-200 text-blue-900 px-2.5 py-0.5 rounded-full font-bold">B-to-B หรือ A-to-A</span>
+                            </div>
+                            <p class="text-slate-600 leading-relaxed mb-3">
+                                เข้าหัวทั้ง 2 ฝั่งด้วยมาตรฐานเดียวกัน (เช่น ฝั่งที่ 1 เป็น T568B และฝั่งที่ 2 เป็น T568B) ใช้สำหรับเชื่อมต่อ <strong>อุปกรณ์ต่างประเภทกัน (Different Devices)</strong>
+                            </p>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-xl border border-blue-200 text-xs text-slate-700">
+                            <strong>ตัวอย่างการใช้งาน:</strong><br>
+                            • คอมพิวเตอร์ (PC) เชื่อมต่อ สวิตช์ (Switch)<br>
+                            • เราเตอร์ (Router) เชื่อมต่อ สวิตช์ (Switch)<br>
+                            • สมาร์ตทีวี หรือ กล้องวงจรปิด เชื่อมต่อ สวิตช์
+                        </div>
+                    </div>
+
+                    <!-- Crossover -->
+                    <div class="bg-amber-50/50 p-5 rounded-2xl border-2 border-amber-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-black text-amber-950 text-base">2. สายไขว้ (Crossover Cable)</h4>
+                                <span class="text-xs bg-amber-200 text-amber-900 px-2.5 py-0.5 rounded-full font-bold">A-to-B</span>
+                            </div>
+                            <p class="text-slate-600 leading-relaxed mb-3">
+                                ฝั่งหนึ่งเข้าแบบ T568A และอีกฝั่งเข้าแบบ T568B (สลับขา Tx และ Rx เข้าหากัน) ใช้สำหรับเชื่อมต่อ <strong>อุปกรณ์ชนิดเดียวกันโดยตรง (Same Devices)</strong>
+                            </p>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-xl border border-amber-200 text-xs text-slate-700">
+                            <strong>ตัวอย่างการใช้งาน:</strong><br>
+                            • คอมพิวเตอร์ (PC) ต่อตรงกับ คอมพิวเตอร์ (PC)<br>
+                            • สวิตช์ (Switch) ต่อกับ สวิตช์ (Switch)<br>
+                            • เราเตอร์ (Router) ต่อตรงกับ เราเตอร์ (Router)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auto-MDIX Technology Callout -->
+                <div class="p-4 bg-gradient-to-r from-emerald-50 to-cyan-50 rounded-2xl border border-emerald-200 text-xs sm:text-sm text-slate-700">
+                    <h4 class="font-bold text-emerald-950 mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-emerald-600"></i> ข้อควรรู้: เทคโนโลยี Auto-MDI/MDI-X ในปัจจุบัน
+                    </h4>
+                    <p class="leading-relaxed">
+                        การ์ดแลนและสวิตช์ยุคใหม่ (Gigabit Ethernet) มีฟังก์ชัน <strong>Auto-MDIX</strong> ในตัว สามารถสลับคู่สายรับ-ส่ง (Tx/Rx) ให้โดยอัตโนมัติ ทำให้ในปัจจุบันผู้ใช้งานสามารถใช้ <strong>สายตรง (Straight-Through T568B)</strong> เชื่อมต่อได้กับทุกอุปกรณ์โดยไม่ต้องกังวลเรื่องสายไขว้
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 4: Essential Cabling Tools -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-amber-600 text-white font-bold flex items-center justify-center text-sm shadow-md">4.4</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">ชุดเครื่องมือและอุปกรณ์จำเป็นในงานเข้าสายแลน (Cabling Toolkit)</h3>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs sm:text-sm">
+                    <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 shadow-sm flex flex-col items-center text-center">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-3 shadow-inner">
+                            <i class="fa-solid fa-wrench"></i>
+                        </div>
+                        <h4 class="font-black text-slate-900 text-sm">คีมย้ำหัว RJ-45</h4>
+                        <p class="text-[11px] text-amber-700 font-semibold mb-1">Crimping Tool</p>
+                        <p class="text-slate-600 text-xs">ใช้สำหรับตัดสาย ปอกเปลือก และบีบอัดเดือยทองแดงของหัว RJ-45 ให้สัมผัสกับสายลวด</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 shadow-sm flex flex-col items-center text-center">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl mb-3 shadow-inner">
+                            <i class="fa-solid fa-plug"></i>
+                        </div>
+                        <h4 class="font-black text-slate-900 text-sm">หัว RJ-45 & บูทยาง</h4>
+                        <p class="text-[11px] text-blue-700 font-semibold mb-1">Modular Plug & Boot</p>
+                        <p class="text-slate-600 text-xs">หัวต่อพลาสติกใส 8 ขาทองแดง และปลอกยางหุ้มเพื่อถนอมสายไม่ให้หักงอง่าย</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 shadow-sm flex flex-col items-center text-center">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mb-3 shadow-inner">
+                            <i class="fa-solid fa-scissors"></i>
+                        </div>
+                        <h4 class="font-black text-slate-900 text-sm">มีดปอกสาย UTP</h4>
+                        <p class="text-[11px] text-emerald-700 font-semibold mb-1">Cable Stripper</p>
+                        <p class="text-slate-600 text-xs">อุปกรณ์หมุนคัตเตอร์รอบสายเพื่อปอกฉนวนพลาสติกนอกอย่างรวดเร็วโดยไม่บาดสายใน</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 shadow-sm flex flex-col items-center text-center">
+                        <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl mb-3 shadow-inner">
+                            <i class="fa-solid fa-microchip"></i>
+                        </div>
+                        <h4 class="font-black text-slate-900 text-sm">เครื่องทดสอบสายแลน</h4>
+                        <p class="text-[11px] text-rose-700 font-semibold mb-1">Network Cable Tester</p>
+                        <p class="text-slate-600 text-xs">เครื่องตรวจเช็คความต่อเนื่องของสัญญาณ ไฟ LED 1-8 วิ่งเรียงกันเพื่อยืนยันว่าเข้าหัวถูกต้อง</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 5: 6 Steps of Crimping RJ45 Workshop -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-amber-600 text-white font-bold flex items-center justify-center text-sm shadow-md">4.5</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">6 ขั้นตอนปฏิบัติการเข้าหัวสายแลน RJ-45 อย่างมืออาชีพ</h3>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 text-xs sm:text-sm">
+                    <!-- Step 1 -->
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 relative">
+                        <div class="flex items-center justify-between">
+                            <span class="w-7 h-7 rounded-xl bg-amber-600 text-white font-bold inline-flex items-center justify-center text-xs shadow-sm">1</span>
+                            <span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded">ขั้นเตรียม</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm">สวมบูทยาง & ปอกเปลือกนอก</h4>
+                        <p class="text-slate-600 leading-relaxed">
+                            สวมปลอกบูทยางเข้ากับสายก่อน จากนั้นใช้มีดปอกสายหมุนกรีดเปลือกนอกออกประมาณ 2.5 - 3 เซนติเมตร ระวังอย่ากดใบมีดลึกจนบาดฉนวนสายด้านใน
+                        </p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 relative">
+                        <div class="flex items-center justify-between">
+                            <span class="w-7 h-7 rounded-xl bg-amber-600 text-white font-bold inline-flex items-center justify-center text-xs shadow-sm">2</span>
+                            <span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded">คลายเกลียว</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm">คลายเกลียวและดัดสายให้ตรง</h4>
+                        <p class="text-slate-600 leading-relaxed">
+                            คลายเกลียวคู่สายทั้ง 4 คู่ (รวม 8 เส้น) ออกจากกัน ตัดแกนพลาสติกตรงกลางออก (ถ้ามี) แล้วใช้นิ้วนวดดัดเส้นลวดแต่ละเส้นให้ตรงเรียบ
+                        </p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 relative">
+                        <div class="flex items-center justify-between">
+                            <span class="w-7 h-7 rounded-xl bg-amber-600 text-white font-bold inline-flex items-center justify-center text-xs shadow-sm">3</span>
+                            <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">จัดระเบียบ</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm">จัดเรียงสีตามมาตรฐาน T568B</h4>
+                        <p class="text-slate-600 leading-relaxed">
+                            เรียงลำดับสี: ขาวส้ม, ส้ม, ขาวเขียว, น้ำเงิน, ขาวน้ำเงิน, เขียว, ขาวน้ำตาล, น้ำตาล ดึงสายให้เรียงชิดติดกันในระนาบแบนเดียวกัน
+                        </p>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 relative">
+                        <div class="flex items-center justify-between">
+                            <span class="w-7 h-7 rounded-xl bg-amber-600 text-white font-bold inline-flex items-center justify-center text-xs shadow-sm">4</span>
+                            <span class="text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded">ตัดแต่ง</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm">ตัดปลายสายให้ตรงฉากเสมอกัน</h4>
+                        <p class="text-slate-600 leading-relaxed">
+                            ใช้ใบมีดตัดที่คีมย้ำ ตัดปลายสายทั้ง 8 เส้นให้ตรงฉาก โดยเหลือความยาวสายประมาณ <strong>1.2 - 1.4 เซนติเมตร</strong> เพื่อให้เปลือกนอกสามารถสอดเข้าไปในหัว RJ-45 ได้
+                        </p>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 relative">
+                        <div class="flex items-center justify-between">
+                            <span class="w-7 h-7 rounded-xl bg-amber-600 text-white font-bold inline-flex items-center justify-center text-xs shadow-sm">5</span>
+                            <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">ย้ำสาย</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm">สอดสายเข้าหัว RJ-45 & บีบย้ำ</h4>
+                        <p class="text-slate-600 leading-relaxed">
+                            คว่ำเขี้ยวล็อคลง สอดสายเข้าไปให้สุดจนปลายทองแดงชนผนังหน้าหัว RJ-45 จากนั้นใส่ลงช่อง 8P ของคีมย้ำแล้วออกแรงบีบให้แน่นสนิท
+                        </p>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 relative">
+                        <div class="flex items-center justify-between">
+                            <span class="w-7 h-7 rounded-xl bg-emerald-600 text-white font-bold inline-flex items-center justify-center text-xs shadow-sm">6</span>
+                            <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">ทดสอบ</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm">ทดสอบสายด้วย Cable Tester</h4>
+                        <p class="text-slate-600 leading-relaxed">
+                            เสียบปลายสายทั้ง 2 ฝั่งเข้า Master และ Remote ของตัวทดสอบ ไฟ LED หมายเลข 1 ถึง 8 ต้องติดสว่างเรียงตามลำดับพร้อมกันทั้ง 2 ฝั่ง
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 6: Cable Testing Faults & Troubleshooting -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-amber-600 text-white font-bold flex items-center justify-center text-sm shadow-md">4.6</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">การวิเคราะห์และแก้ไขข้อผิดพลาดในการเข้าสายแลน (Troubleshooting)</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs sm:text-sm">
+                    <div class="bg-rose-50/50 p-4 rounded-2xl border border-rose-200">
+                        <div class="flex items-center space-x-2 text-rose-700 font-bold mb-1.5">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <h4>1. Open (สายขาด / สัญญาณไม่ติด)</h4>
+                        </div>
+                        <p class="text-slate-600 text-xs">ไฟ LED บางดวงไม่ติด สาเหตุจากสอดสายไม่สุด หรือย้ำไม่แน่นจนเขี้ยวทองแดงไม่จิกโดนสายลวด</p>
+                    </div>
+
+                    <div class="bg-rose-50/50 p-4 rounded-2xl border border-rose-200">
+                        <div class="flex items-center space-x-2 text-rose-700 font-bold mb-1.5">
+                            <i class="fa-solid fa-shuffle"></i>
+                            <h4>2. Miswire (เรียงสีสลับ)</h4>
+                        </div>
+                        <p class="text-slate-600 text-xs">ไฟ LED ติดครบ 8 ดวงแต่วิ่งสลับลำดับ เช่น 1, 3, 2, 4... เกิดจากการเรียงลำดับสีผิดตั้งแต่แรก</p>
+                    </div>
+
+                    <div class="bg-rose-50/50 p-4 rounded-2xl border border-rose-200">
+                        <div class="flex items-center space-x-2 text-rose-700 font-bold mb-1.5">
+                            <i class="fa-solid fa-bolt"></i>
+                            <h4>3. Short (สายช็อตลัดวงจร)</h4>
+                        </div>
+                        <p class="text-slate-600 text-xs">ไฟ LED ติดสว่างพร้อมกัน 2 ดวงในแถวเดียวกัน เกิดจากทองแดงของสองเส้นสัมผัสกัน</p>
+                    </div>
+
+                    <div class="bg-rose-50/50 p-4 rounded-2xl border border-rose-200">
+                        <div class="flex items-center space-x-2 text-rose-700 font-bold mb-1.5">
+                            <i class="fa-solid fa-code-fork"></i>
+                            <h4>4. Split Pairs (คู่สายแยก)</h4>
+                        </div>
+                        <p class="text-slate-600 text-xs">ไฟติดเรียง 1-8 ปกติ แต่นำไปใช้งานจริงแล้วเกิด Crosstalk ความเร็วตก เกิดจากสลับคู่สายข้ามคู่เกลียว</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 7: Summary & Key Takeaways Checklist -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border-2 border-amber-300 bg-gradient-to-b from-amber-50/30 to-white">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-200 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-r from-amber-600 to-orange-500 text-white flex items-center justify-center text-lg shadow-md">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl sm:text-2xl font-black text-slate-900">สรุปประเด็นสำคัญประจำหน่วยที่ 4 (Key Takeaways)</h3>
+                        <p class="text-xs text-amber-700">ทบทวนทักษะและมาตรฐานการเข้าสายแลน</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700">
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-amber-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">มาตรฐาน T568B:</strong> ขาวส้ม, ส้ม, ขาวเขียว, น้ำเงิน, ขาวน้ำเงิน, เขียว, ขาวน้ำตาล, น้ำตาล (นิยมใช้มากที่สุด)
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-amber-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">สายตรง vs สายไขว้:</strong> สายตรง (B-to-B) ใช้ต่ออุปกรณ์ต่างชนิด ส่วนสายไขว้ (A-to-B) ใช้ต่ออุปกรณ์ชนิดเดียวกัน
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-amber-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">สาย Cat 6:</strong> มาตรฐานหลักปัจจุบัน รองรับแบนด์วิดท์ 250 MHz และความเร็วสูงสุด 10 Gbps
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-amber-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">การสอดสายเข้าหัว RJ-45:</strong> ต้องให้เปลือกนอกเข้าไปอยู่ในหัว RJ-45 เพื่อให้เดือยพลาสติกล็อคสายไม่ให้หลุด
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-amber-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">Auto-MDIX:</strong> สวิตช์และพอร์ต LAN ยุคใหม่สลับคู่สายให้อัตโนมัติ จึงใช้สายตรงได้กับทุกสถานการณ์
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-amber-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">การทดสอบสาย:</strong> ต้องตรวจด้วย Cable Tester ให้ไฟ LED 1 ถึง 8 ติดเรียงกันครบถ้วนทั้งสองฝั่ง
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation Buttons -->
+        <section class="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
+            <a href="unit3.html" class="bg-white hover:bg-slate-100 text-slate-700 font-bold px-6 py-3.5 rounded-2xl border border-slate-300 shadow-sm flex items-center gap-2 text-xs sm:text-sm transition-all hover:-translate-x-1">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>บทเรียนก่อนหน้า (Unit 3: การรับส่งข้อมูล)</span>
+            </a>
+            <a href="unit5.html" class="bg-gradient-to-r from-amber-600 to-rose-500 hover:from-amber-700 hover:to-rose-600 text-white font-bold px-7 py-3.5 rounded-2xl shadow-lg shadow-amber-500/25 flex items-center gap-2 text-xs sm:text-sm transition-all hover:translate-x-1 active:scale-95">
+                <span>ไปบทเรียนถัดไป (Unit 5: ความปลอดภัย)</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-8 px-4 text-xs text-center border-t border-slate-800">
+        <p>© 2026 Chaithawat Srisaenworakun. All rights reserved.</p>
+        <p class="text-slate-500 text-[11px] mt-1">Computer Network and Security Learning Platform for Google Sites</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+
+        function toggleSidebar() {
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        // Scroll Reveal Observer
+        document.addEventListener('DOMContentLoaded', () => {
+            const revealElements = document.querySelectorAll('.reveal-on-scroll');
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries, obs) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-revealed');
+                            obs.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+                revealElements.forEach(el => observer.observe(el));
+            } else {
+                revealElements.forEach(el => el.classList.add('is-revealed'));
+            }
+        });
+    </script>
+</body>
+</html>

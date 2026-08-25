@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>หน่วยที่ 3: การรับส่งข้อมูลบนเครือข่าย | สื่อการเรียนรู้ออนไลน์</title>
+    
+    <!-- Google Fonts: Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons 6.5.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Kanit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                            dark: '#0a192f'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f0fdf4;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .bg-grid-cyber {
+            background-image: 
+                linear-gradient(to right, rgba(5, 150, 105, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(5, 150, 105, 0.06) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        .unit-hero {
+            background: linear-gradient(135deg, #064e3b 0%, #047857 40%, #0284c7 100%);
+        }
+
+        .content-box {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px -4px rgba(5, 150, 105, 0.08);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+        }
+        .content-box:hover {
+            box-shadow: 0 16px 32px -8px rgba(5, 150, 105, 0.18);
+        }
+
+        .quiz-option {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+        .quiz-option:hover {
+            border-color: #059669;
+            background-color: #f0fdf4;
+            transform: translateX(4px);
+        }
+        .quiz-option:has(input:checked) {
+            border-color: #059669;
+            background-color: #dcfce7;
+            box-shadow: 0 4px 12px -2px rgba(5, 150, 105, 0.2);
+            transform: translateX(6px);
+        }
+
+        /* Scroll reveal */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .reveal-on-scroll.is-revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop-in {
+            animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, ::before, ::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .reveal-on-scroll {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white relative">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-white/95 backdrop-blur-md text-slate-800 sticky top-0 z-50 shadow-md border-b border-slate-200/80 w-full">
+        <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
+            
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-xl bg-slate-100 text-emerald-600 hover:bg-emerald-50 transition-all border border-slate-200">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                
+                <a href="index.html" class="flex items-center space-x-2.5 group">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-600 to-cyan-500 p-0.5 shadow-md flex items-center justify-center shrink-0">
+                        <div class="w-full h-full rounded-full bg-slate-900 flex items-center justify-center overflow-hidden border border-white">
+                            <i class="fa-solid fa-user-tie text-emerald-400 text-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-sm sm:text-base text-slate-900 leading-tight">
+                            CHAITHAWAT <span class="text-xs text-emerald-600 font-semibold hidden sm:inline">| SRISAENWORAKUN</span>
+                        </h1>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium">Computer Network and Security Learning Hub</p>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="hidden lg:flex items-center space-x-1 font-medium text-xs">
+                <a href="index.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80 transition-all">
+                    <span>Home</span>
+                </a>
+                <a href="unit1.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80 transition-all">
+                    <span>รู้จักเครือข่ายคอมพิวเตอร์</span>
+                </a>
+                <a href="unit2.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80 transition-all">
+                    <span>อุปกรณ์เครือข่าย</span>
+                </a>
+                <a href="unit3.html" class="px-3.5 py-2 rounded-xl bg-emerald-600 text-white font-semibold shadow-sm transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-right-left text-xs"></i>
+                    <span>การรับส่งข้อมูล</span>
+                </a>
+                <a href="unit4.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80 transition-all">
+                    <span>การเข้าสายแลน</span>
+                </a>
+                <a href="unit5.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80 transition-all">
+                    <span>ความปลอดภัย</span>
+                </a>
+            </nav>
+
+            <div class="flex items-center space-x-2">
+                <a href="unit4.html" class="bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-full transition-all shadow-md flex items-center gap-1.5 active:scale-95">
+                    <span>บทถัดไป (Unit 4)</span>
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Off-Canvas Sidebar -->
+    <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 hidden transition-opacity"></div>
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-slate-900 text-white flex flex-col justify-between z-50 shadow-2xl border-r border-slate-800 overflow-y-auto transform -translate-x-full transition-transform duration-300 ease-in-out">
+        <div class="p-5">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
+                <span class="text-xs font-bold text-cyan-400 tracking-wider uppercase"><i class="fa-solid fa-compass mr-1"></i> เมนูบทเรียน</span>
+                <button onclick="toggleSidebar()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <nav class="space-y-1.5 text-xs font-medium">
+                <a href="index.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all">
+                    <i class="fa-solid fa-house w-5 text-center"></i>
+                    <span>หน้าหลัก (Home)</span>
+                </a>
+                <a href="unit1.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition-all">
+                    <i class="fa-solid fa-diagram-project text-blue-400 w-5 text-center"></i>
+                    <span>1. รู้จักเครือข่ายคอมพิวเตอร์</span>
+                </a>
+                <a href="unit2.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition-all">
+                    <i class="fa-solid fa-server text-cyan-400 w-5 text-center"></i>
+                    <span>2. อุปกรณ์เครือข่ายคอมพิวเตอร์</span>
+                </a>
+                <a href="unit3.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl bg-emerald-600 text-white shadow-md">
+                    <i class="fa-solid fa-right-left text-emerald-200 w-5 text-center"></i>
+                    <span>3. การรับส่งข้อมูลบนเครือข่าย</span>
+                </a>
+                <a href="unit4.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition-all">
+                    <i class="fa-solid fa-ethernet text-amber-400 w-5 text-center"></i>
+                    <span>4. การเข้าสายแลนเชื่อมต่อระบบ</span>
+                </a>
+                <a href="unit5.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition-all">
+                    <i class="fa-solid fa-shield-halved text-rose-400 w-5 text-center"></i>
+                    <span>5. ความปลอดภัยบนระบบเครือข่าย</span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-400">
+            <p class="text-[10px] text-slate-500 text-center">© 2026 Chaithawat Srisaenworakun</p>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="w-full flex-1 bg-grid-cyber pb-16">
+        
+        <!-- Unit Hero Banner -->
+        <section class="max-w-7xl mx-auto px-4 pt-4 pb-6">
+            <div class="unit-hero text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden border border-emerald-400/30">
+                <div class="relative z-10 max-w-3xl">
+                    <div class="flex items-center space-x-2 text-xs text-emerald-200 mb-3">
+                        <a href="index.html" class="hover:underline flex items-center gap-1"><i class="fa-solid fa-house"></i> หน้าหลัก</a>
+                        <span>/</span>
+                        <span class="text-white font-semibold">หน่วยที่ 3</span>
+                    </div>
+
+                    <span class="inline-block bg-emerald-500/40 border border-emerald-300/40 text-emerald-100 text-xs font-bold px-3 py-1 rounded-full mb-3">
+                        UNIT 03 • โพรโทคอลและการสื่อสาร
+                    </span>
+                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-md">
+                        การรับส่งข้อมูลบนเครือข่าย
+                    </h1>
+                    <p class="text-base sm:text-lg text-emerald-100 mt-2 font-light">
+                        Data Transmission, OSI Model 7 Layers, TCP/IP and IP Addressing
+                    </p>
+                    
+                    <div class="mt-5 flex flex-wrap items-center gap-4 text-xs text-emerald-100/90 pt-3 border-t border-emerald-300/20">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock text-emerald-300"></i> เวลาเรียน: 3 ชั่วโมง</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-brands fa-youtube text-red-400"></i> วิดีโอบทเรียน</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-emerald-300"></i> OSI 7 Layers & TCP/IP</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-graduation-cap text-emerald-300"></i> สรุปสาระสำคัญ</span>
+                    </div>
+                </div>
+
+                <i class="fa-solid fa-right-left absolute -right-6 -bottom-8 text-[220px] text-emerald-400/10 pointer-events-none"></i>
+            </div>
+        </section>
+
+        <!-- Learning Objectives Card -->
+        <section class="max-w-7xl mx-auto px-4 mb-8">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border-2 border-emerald-200">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg shadow-md">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">จุดประสงค์การเรียนรู้</h2>
+                        <p class="text-xs text-emerald-700">เมื่อศึกษาหน่วยนี้แล้ว ผู้เรียนจะมีความรู้ความสามารถดังนี้</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700">
+                    <div class="flex items-start space-x-3 bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-100">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-base mt-0.5 shrink-0"></i>
+                        <span>1. อธิบายหน้าที่ของแต่ละชั้นในแบบจำลอง OSI Model 7 Layers และ TCP/IP Model ได้</span>
+                    </div>
+                    <div class="flex items-start space-x-3 bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-100">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-base mt-0.5 shrink-0"></i>
+                        <span>2. จำแนกความแตกต่างระหว่างหมายเลข IP Address (Logical Address) และ MAC Address (Physical Address) ได้</span>
+                    </div>
+                    <div class="flex items-start space-x-3 bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-100">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-base mt-0.5 shrink-0"></i>
+                        <span>3. อธิบายโครงสร้างหมายเลข IPv4 คลาส A, B, C และความจำเป็นในการเปลี่ยนผ่านสู่ IPv6</span>
+                    </div>
+                    <div class="flex items-start space-x-3 bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-100">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-base mt-0.5 shrink-0"></i>
+                        <span>4. เข้าใจบทบาทหน้าที่ของ Subnet Mask, Default Gateway และ DNS Server ในการเชื่อมต่ออินเทอร์เน็ต</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Learning Section (YouTube Embed) -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border-2 border-emerald-300 bg-gradient-to-b from-emerald-50/40 via-white to-teal-50/20 shadow-lg">
+                <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-200 mb-6 gap-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-500 text-white flex items-center justify-center text-xl shadow-md shadow-red-500/20">
+                            <i class="fa-brands fa-youtube"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-black text-slate-900">วิดีโอเสริมการเรียนรู้: การสื่อสารข้อมูลและเครือข่ายคอมพิวเตอร์</h3>
+                            <p class="text-xs text-emerald-800">ทำความเข้าใจภาพรวมกระบวนการรับส่งข้อมูล แบบจำลองเครือข่าย และพื้นฐาน Data Communication</p>
+                        </div>
+                    </div>
+                    <span class="self-start md:self-auto text-xs bg-red-100 text-red-700 font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-red-200">
+                        <i class="fa-solid fa-play text-[10px]"></i> บทเรียนมัลติมีเดีย
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <!-- Responsive YouTube Embed -->
+                    <div class="lg:col-span-8">
+                        <div class="relative w-full rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-slate-900" style="padding-top: 56.25%;">
+                            <iframe 
+                                class="absolute top-0 left-0 w-full h-full"
+                                src="https://www.youtube.com/embed/wA8wnGBFtLg" 
+                                title="การสื่อสารข้อมูลและเครือข่ายคอมพิวเตอร์" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                referrerpolicy="strict-origin-when-cross-origin"
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        <div class="mt-3 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-emerald-100 text-xs text-slate-500">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-info text-emerald-600"></i> หากมีข้อจำกัดด้านเบราว์เซอร์หรือเครื่องขัดข้อง สามารถเปิดดูผ่าน YouTube ได้โดยตรง:</span>
+                            <a href="https://www.youtube.com/watch?v=wA8wnGBFtLg" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white font-bold px-3.5 py-1.5 rounded-xl shadow transition-all active:scale-95 text-xs">
+                                <i class="fa-brands fa-youtube"></i>
+                                <span>เปิดดูบน YouTube</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Video Highlights & Guide -->
+                    <div class="lg:col-span-4 space-y-3.5 text-xs sm:text-sm">
+                        <div class="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm space-y-2">
+                            <h4 class="font-bold text-slate-900 flex items-center gap-2 text-sm">
+                                <i class="fa-solid fa-lightbulb text-amber-500"></i> ประเด็นสำคัญในคลิปวิดีโอ:
+                            </h4>
+                            <ul class="space-y-2 text-slate-600 text-xs">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-play text-red-500 mt-0.5 shrink-0"></i>
+                                    <span>องค์ประกอบและขั้นตอนการส่งผ่านข้อมูลในระบบเครือข่าย</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-play text-red-500 mt-0.5 shrink-0"></i>
+                                    <span>หลักการทำงานตามแบบจำลอง OSI และโพรโทคอล TCP/IP</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-play text-red-500 mt-0.5 shrink-0"></i>
+                                    <span>การระบุตำแหน่งปลายทางด้วยหมายเลข IP และ Subnet</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="p-4 bg-gradient-to-br from-slate-900 via-emerald-950 to-teal-900 text-white rounded-2xl shadow-md space-y-1 border border-emerald-500/30">
+                            <div class="flex items-center gap-2 text-emerald-300 font-bold text-xs">
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                                <span>คำแนะนำสำหรับผู้เรียน</span>
+                            </div>
+                            <p class="text-[11px] text-slate-200 leading-relaxed">
+                                เมื่อดูคลิปจบแล้ว แนะนำให้ศึกษาตารางชั้น OSI 7 Layers และขั้นตอน TCP 3-Way Handshake อย่างละเอียดในหัวข้อด้านล่าง
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 1: OSI 7 Layers & Encapsulation Mechanism -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center text-sm shadow-md">3.1</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">แบบจำลองมาตรฐาน OSI 7 Layers และกลไก Encapsulation</h3>
+                </div>
+
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+                    <strong>OSI Model (Open Systems Interconnection)</strong> คือ แบบจำลองอ้างอิงมาตรฐานสากลที่กำหนดโดย ISO แบ่งขั้นตอนการสื่อสารข้อมูลออกเป็น 7 ระดับชั้น (Layers) ช่วยให้อุปกรณ์ต่างผู้ผลิตสามารถทำงานร่วมกันได้อย่างราบรื่น
+                </p>
+
+                <div class="space-y-3 mb-6">
+                    <!-- Layer 7 -->
+                    <div class="p-4 bg-slate-50 hover:bg-emerald-50/80 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs sm:text-sm transition-colors">
+                        <div class="flex items-center space-x-3 min-w-[220px]">
+                            <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center text-xs shadow-sm">7</span>
+                            <div>
+                                <span class="font-bold text-slate-900 block">Application Layer</span>
+                                <span class="text-[11px] text-emerald-700">ชั้นประยุกต์</span>
+                            </div>
+                        </div>
+                        <span class="text-slate-600 flex-1">ส่วนต่อประสานกับผู้ใช้และซอฟต์แวร์ เช่น เว็บบราวเซอร์ อีเมลไคลเอนต์ (HTTP, HTTPS, DNS, FTP, SMTP, SSH)</span>
+                        <span class="text-[11px] font-mono font-bold bg-emerald-100 text-emerald-800 px-3 py-1 rounded-lg shrink-0">Data</span>
+                    </div>
+
+                    <!-- Layer 6 -->
+                    <div class="p-4 bg-slate-50 hover:bg-emerald-50/80 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs sm:text-sm transition-colors">
+                        <div class="flex items-center space-x-3 min-w-[220px]">
+                            <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center text-xs shadow-sm">6</span>
+                            <div>
+                                <span class="font-bold text-slate-900 block">Presentation Layer</span>
+                                <span class="text-[11px] text-emerald-700">ชั้นนำเสนอ</span>
+                            </div>
+                        </div>
+                        <span class="text-slate-600 flex-1">แปลงรหัสข้อมูลให้อยู่ในรูปแบบเดียวกัน บีบอัดข้อมูล (Compression) และเข้ารหัสความปลอดภัย (SSL/TLS, JPEG, MP4, ASCII)</span>
+                        <span class="text-[11px] font-mono font-bold bg-emerald-100 text-emerald-800 px-3 py-1 rounded-lg shrink-0">Data</span>
+                    </div>
+
+                    <!-- Layer 5 -->
+                    <div class="p-4 bg-slate-50 hover:bg-emerald-50/80 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs sm:text-sm transition-colors">
+                        <div class="flex items-center space-x-3 min-w-[220px]">
+                            <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center text-xs shadow-sm">5</span>
+                            <div>
+                                <span class="font-bold text-slate-900 block">Session Layer</span>
+                                <span class="text-[11px] text-emerald-700">ชั้นเซสชัน</span>
+                            </div>
+                        </div>
+                        <span class="text-slate-600 flex-1">สร้าง รักษา ควบคุม และยุติการเชื่อมต่อระหว่างแอปพลิเคชันต้นทางและปลายทาง (RPC, NetBIOS, Sockets)</span>
+                        <span class="text-[11px] font-mono font-bold bg-emerald-100 text-emerald-800 px-3 py-1 rounded-lg shrink-0">Data</span>
+                    </div>
+
+                    <!-- Layer 4 -->
+                    <div class="p-4 bg-blue-50/80 rounded-2xl border-2 border-blue-200 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs sm:text-sm shadow-sm">
+                        <div class="flex items-center space-x-3 min-w-[220px]">
+                            <span class="w-8 h-8 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center text-xs shadow-sm">4</span>
+                            <div>
+                                <span class="font-bold text-blue-950 block">Transport Layer</span>
+                                <span class="text-[11px] text-blue-700">ชั้นขนส่งข้อมูล (End-to-End)</span>
+                            </div>
+                        </div>
+                        <span class="text-slate-700 flex-1">ควบคุมการแบ่งส่วนข้อมูล จัดลำดับ ตรวจสอบความถูกต้อง และระบุพอร์ตปลายทาง (TCP, UDP, Port 80, Port 443)</span>
+                        <span class="text-[11px] font-mono font-bold bg-blue-200 text-blue-900 px-3 py-1 rounded-lg shrink-0">Segment</span>
+                    </div>
+
+                    <!-- Layer 3 -->
+                    <div class="p-4 bg-indigo-50/80 rounded-2xl border-2 border-indigo-200 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs sm:text-sm shadow-sm">
+                        <div class="flex items-center space-x-3 min-w-[220px]">
+                            <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow-sm">3</span>
+                            <div>
+                                <span class="font-bold text-indigo-950 block">Network Layer</span>
+                                <span class="text-[11px] text-indigo-700">ชั้นเครือข่ายและการค้นหาเส้นทาง</span>
+                            </div>
+                        </div>
+                        <span class="text-slate-700 flex-1">ค้นหาเส้นทางที่ดีที่สุด (Routing) และระบุที่อยู่ตรรกะ Logical Address (IPv4, IPv6, ICMP, Router)</span>
+                        <span class="text-[11px] font-mono font-bold bg-indigo-200 text-indigo-900 px-3 py-1 rounded-lg shrink-0">Packet</span>
+                    </div>
+
+                    <!-- Layer 2 -->
+                    <div class="p-4 bg-amber-50/80 rounded-2xl border-2 border-amber-200 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs sm:text-sm shadow-sm">
+                        <div class="flex items-center space-x-3 min-w-[220px]">
+                            <span class="w-8 h-8 rounded-xl bg-amber-600 text-white font-bold flex items-center justify-center text-xs shadow-sm">2</span>
+                            <div>
+                                <span class="font-bold text-amber-950 block">Data Link Layer</span>
+                                <span class="text-[11px] text-amber-700">ชั้นเชื่อมโยงข้อมูลฮาร์ดแวร์</span>
+                            </div>
+                        </div>
+                        <span class="text-slate-700 flex-1">ส่งต่อข้อมูลข้ามโหนดฮาร์ดแวร์ผ่าน MAC Address และตรวจสอบข้อผิดพลาด FCS (Switch, Ethernet 802.3, Wi-Fi 802.11)</span>
+                        <span class="text-[11px] font-mono font-bold bg-amber-200 text-amber-900 px-3 py-1 rounded-lg shrink-0">Frame</span>
+                    </div>
+
+                    <!-- Layer 1 -->
+                    <div class="p-4 bg-rose-50/80 rounded-2xl border-2 border-rose-200 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs sm:text-sm shadow-sm">
+                        <div class="flex items-center space-x-3 min-w-[220px]">
+                            <span class="w-8 h-8 rounded-xl bg-rose-600 text-white font-bold flex items-center justify-center text-xs shadow-sm">1</span>
+                            <div>
+                                <span class="font-bold text-rose-950 block">Physical Layer</span>
+                                <span class="text-[11px] text-rose-700">ชั้นกายภาพ</span>
+                            </div>
+                        </div>
+                        <span class="text-slate-700 flex-1">แปลงข้อมูลเป็นสัญญาณไฟฟ้า แสง หรือคลื่นวิทยุ วิ่งผ่านตัวกลางจริง (สาย UTP, สาย Fiber Optic, Hub, Transceiver)</span>
+                        <span class="text-[11px] font-mono font-bold bg-rose-200 text-rose-900 px-3 py-1 rounded-lg shrink-0">Bits (0, 1)</span>
+                    </div>
+                </div>
+
+                <!-- Encapsulation / Decapsulation Concept -->
+                <div class="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200 text-xs sm:text-sm text-slate-700">
+                    <h4 class="font-bold text-emerald-950 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-down-to-line text-emerald-600"></i> กระบวนการ Encapsulation vs Decapsulation:
+                    </h4>
+                    <p class="leading-relaxed">
+                        • <strong>Encapsulation (ฝั่งผู้ส่ง):</strong> ข้อมูลจาก Application ถูกส่งลงมาทีละชั้น โดยแต่ละชั้นจะเพิ่มส่วนหัว (Header) ของตนเอง: Data -> Segment (+TCP Header) -> Packet (+IP Header) -> Frame (+MAC Header & Trailer) -> Bits ออกสู่สายสัญญาณ<br>
+                        • <strong>Decapsulation (ฝั่งผู้รับ):</strong> เมื่อผู้รับได้รับบิตข้อมูล จะถอดส่วนหัวออกทีละชั้นย้อนกลับขึ้นไปจนถึงข้อมูลดิบที่แอปพลิเคชันต้องการ
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 2: TCP vs UDP & The 3-Way Handshake -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center text-sm shadow-md">3.2</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">โพรโทคอลชั้นขนส่ง: TCP vs UDP และกลไก 3-Way Handshake</h3>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- TCP -->
+                    <div class="bg-blue-50/60 p-6 rounded-2xl border-2 border-blue-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-bold bg-blue-200 text-blue-900 px-3 py-1 rounded-full">Connection-Oriented</span>
+                                <i class="fa-solid fa-shield text-blue-600 text-xl"></i>
+                            </div>
+                            <h4 class="font-black text-blue-950 text-lg">TCP (Transmission Control Protocol)</h4>
+                            <p class="text-xs text-blue-700 font-semibold mb-3">เน้นความถูกต้อง แม่นยำ ครบถ้วน 100%</p>
+                            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                ต้องสร้างการเชื่อมต่อก่อนส่งข้อมูลจริง (3-Way Handshake) มีระบบตอบรับ (Acknowledgement) หากแพ็กเกจสูญหายจะส่งซ้ำใหม่ (Retransmission) และจัดเรียงข้อมูลตามลำดับที่ถูกต้อง
+                            </p>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-xl border border-blue-200 text-xs text-slate-700">
+                            <strong>การใช้งาน:</strong> เปิดเว็บ (HTTP/HTTPS), ส่งไฟล์ (FTP), รับส่งอีเมล (SMTP/IMAP), เข้าจัดการเครื่องระยะไกล (SSH)
+                        </div>
+                    </div>
+
+                    <!-- UDP -->
+                    <div class="bg-amber-50/60 p-6 rounded-2xl border-2 border-amber-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-bold bg-amber-200 text-amber-900 px-3 py-1 rounded-full">Connectionless</span>
+                                <i class="fa-solid fa-bolt text-amber-600 text-xl"></i>
+                            </div>
+                            <h4 class="font-black text-amber-950 text-lg">UDP (User Datagram Protocol)</h4>
+                            <p class="text-xs text-amber-700 font-semibold mb-3">เน้นความรวดเร็ว ความหน่วงต่ำพิเศษ (Low Latency)</p>
+                            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                ส่งข้อมูลทันทีโดยไม่ต้องเชื่อมต่อ ไม่มีการส่งสัญญาณตอบรับ (No ACK) หากข้อมูลหล่นหายจะไม่ส่งซ้ำ เพื่อรักษาความต่อเนื่องของภาพและเสียงในเวลาจริง
+                            </p>
+                        </div>
+                        <div class="bg-white p-3.5 rounded-xl border border-amber-200 text-xs text-slate-700">
+                            <strong>การใช้งาน:</strong> Live Streaming (YouTube Live, Twitch), โทรศัพท์ผ่านเน็ต (VoIP/Zoom), เกมออนไลน์ (Online Gaming), DNS Lookup
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3-Way Handshake Step-by-Step Box -->
+                <div class="p-5 bg-slate-900 text-white rounded-2xl border border-blue-500/30">
+                    <h4 class="font-bold text-cyan-300 text-sm mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-handshake"></i> ขั้นตอนการทำงานของ TCP 3-Way Handshake:
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                        <div class="bg-slate-800/90 p-3.5 rounded-xl border border-slate-700">
+                            <span class="text-cyan-400 font-bold block mb-1">Step 1: SYN (Synchronize)</span>
+                            <p class="text-slate-300">Client ส่งคำขอขอเริ่มการเชื่อมต่อไปยัง Server พร้อมกำหนดหมายเลข Sequence เริ่มต้น</p>
+                        </div>
+                        <div class="bg-slate-800/90 p-3.5 rounded-xl border border-slate-700">
+                            <span class="text-emerald-400 font-bold block mb-1">Step 2: SYN-ACK</span>
+                            <p class="text-slate-300">Server ตอบรับการเชื่อมต่อและส่งสัญญาณยินยอมกลับมาพร้อมกับหมายเลข Sequence ของตนเอง</p>
+                        </div>
+                        <div class="bg-slate-800/90 p-3.5 rounded-xl border border-slate-700">
+                            <span class="text-blue-400 font-bold block mb-1">Step 3: ACK (Acknowledge)</span>
+                            <p class="text-slate-300">Client ตอบรับการยืนยัน และพร้อมเริ่มต้นส่งข้อมูลจริงอย่างปลอดภัย (Established Connection)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 3: IP Addressing (IPv4, Classes, Private IPs, CIDR & IPv6) -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center text-sm shadow-md">3.3</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">หมายเลขไอพี (IP Addressing) และการแบ่งคลาส IPv4 / IPv6</h3>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- IPv4 Details -->
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4 text-xs sm:text-sm">
+                        <div class="flex items-center space-x-2 text-emerald-700 font-bold text-base">
+                            <i class="fa-solid fa-network-wired"></i>
+                            <h4>โครงสร้าง IPv4 (32-bit Address)</h4>
+                        </div>
+                        <p class="text-slate-600 leading-relaxed">
+                            ประกอบด้วย 32 บิต แบ่งออกเป็น 4 ส่วน (Octet ละ 8 บิต) คั่นด้วยจุด เช่น <code class="bg-white border border-slate-300 px-2 py-0.5 rounded font-mono font-bold text-slate-800">192.168.1.100</code> มีจำนวนไอพีทั้งหมดประมาณ 4,294,967,296 หมายเลข
+                        </p>
+
+                        <!-- IPv4 Classes Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-800 text-white">
+                                        <th class="p-2 rounded-tl-lg">คลาส</th>
+                                        <th class="p-2">ช่วงไอพี (IP Range)</th>
+                                        <th class="p-2">Default Subnet</th>
+                                        <th class="p-2 rounded-tr-lg">ขนาดเครือข่าย</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
+                                    <tr>
+                                        <td class="p-2 font-bold text-blue-700">Class A</td>
+                                        <td class="p-2 font-mono">1.0.0.0 – 126.255.255.255</td>
+                                        <td class="p-2 font-mono">255.0.0.0 (/8)</td>
+                                        <td class="p-2">เครือข่ายขนาดใหญ่มาก (16M Hosts)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2 font-bold text-cyan-700">Class B</td>
+                                        <td class="p-2 font-mono">128.0.0.0 – 191.255.255.255</td>
+                                        <td class="p-2 font-mono">255.255.0.0 (/16)</td>
+                                        <td class="p-2">เครือข่ายขนาดกลาง (65,534 Hosts)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2 font-bold text-emerald-700">Class C</td>
+                                        <td class="p-2 font-mono">192.0.0.0 – 223.255.255.255</td>
+                                        <td class="p-2 font-mono">255.255.255.0 (/24)</td>
+                                        <td class="p-2 font-semibold">เครือข่ายขนาดเล็ก (254 Hosts - นิยมสุด)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Private IP & IPv6 Details -->
+                    <div class="space-y-4 text-xs sm:text-sm">
+                        <!-- RFC 1918 Private IP Box -->
+                        <div class="p-5 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border-2 border-blue-200">
+                            <h4 class="font-bold text-blue-950 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-lock text-blue-600"></i> ช่วง Private IP Address สำหรับใช้งานภายใน (RFC 1918):
+                            </h4>
+                            <p class="text-xs text-slate-600 mb-2">เป็นหมายเลขไอพีสงวนไว้ใช้ภายในองค์กรหรือบ้านฟรี ไม่วิ่งบนอินเทอร์เน็ตสาธารณะ:</p>
+                            <ul class="space-y-1 text-xs font-mono text-blue-900 bg-white/80 p-3 rounded-xl border border-blue-200">
+                                <li>• <strong>Class A Private:</strong> 10.0.0.0 – 10.255.255.255 (/8)</li>
+                                <li>• <strong>Class B Private:</strong> 172.16.0.0 – 172.31.255.255 (/12)</li>
+                                <li>• <strong>Class C Private:</strong> 192.168.0.0 – 192.168.255.255 (/16)</li>
+                            </ul>
+                        </div>
+
+                        <!-- IPv6 Card -->
+                        <div class="p-5 bg-slate-900 text-white rounded-2xl border border-emerald-500/30">
+                            <div class="flex items-center space-x-2 text-emerald-400 font-bold mb-2">
+                                <i class="fa-solid fa-globe"></i>
+                                <h4>IPv6 (128-bit Next Gen)</h4>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed mb-2">
+                                แก้ปัญหา IPv4 หมดโลก ขนาด 128 บิต เขียนด้วยเลขฐานสิบหก 8 กลุ่ม คั่นด้วยโคลอน เช่น <code class="bg-slate-800 px-1.5 py-0.5 rounded text-emerald-300 font-mono text-[11px]">2001:0db8:85a3::8a2e:0370:7334</code> รองรับได้ถึง 340 ล้านล้านล้านล้านล้านหมายเลข และมีระบบความปลอดภัย IPSec ฝังมาในตัว
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 4: Essential Network Services & Well-Known Port Numbers -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center text-sm shadow-md">3.4</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">โพรโทคอลบริการเครือข่ายและหมายเลขพอร์ตมาตรฐาน (Well-Known Ports)</h3>
+                </div>
+
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead>
+                            <tr class="bg-emerald-700 text-white">
+                                <th class="p-3.5 rounded-tl-2xl font-semibold">พอร์ต (Port Number)</th>
+                                <th class="p-3.5 font-semibold">โพรโทคอล (Protocol)</th>
+                                <th class="p-3.5 font-semibold">Transport</th>
+                                <th class="p-3.5 rounded-tr-2xl font-semibold">หน้าที่และคำอธิบาย</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 text-slate-700 bg-white">
+                            <tr class="hover:bg-emerald-50/50">
+                                <td class="p-3 font-mono font-bold text-blue-700">Port 80</td>
+                                <td class="p-3 font-bold">HTTP</td>
+                                <td class="p-3 font-mono">TCP</td>
+                                <td class="p-3">เรียกดูหน้าเว็บไซต์แบบธรรมดา (ไม่เข้ารหัส)</td>
+                            </tr>
+                            <tr class="hover:bg-emerald-50/50">
+                                <td class="p-3 font-mono font-bold text-emerald-700">Port 443</td>
+                                <td class="p-3 font-bold text-emerald-800">HTTPS</td>
+                                <td class="p-3 font-mono">TCP</td>
+                                <td class="p-3 font-semibold text-emerald-900">เรียกดูหน้าเว็บไซต์แบบปลอดภัย เข้ารหัสข้อมูลด้วย SSL/TLS (มาตรฐานปัจจุบัน)</td>
+                            </tr>
+                            <tr class="hover:bg-emerald-50/50">
+                                <td class="p-3 font-mono font-bold text-purple-700">Port 53</td>
+                                <td class="p-3 font-bold">DNS</td>
+                                <td class="p-3 font-mono">UDP / TCP</td>
+                                <td class="p-3">แปลงชื่อโดเมน (เช่น www.google.com) เป็น IP Address</td>
+                            </tr>
+                            <tr class="hover:bg-emerald-50/50">
+                                <td class="p-3 font-mono font-bold text-amber-700">Port 67 / 68</td>
+                                <td class="p-3 font-bold">DHCP</td>
+                                <td class="p-3 font-mono">UDP</td>
+                                <td class="p-3">จ่ายหมายเลข IP และการตั้งค่าเน็ตเวิร์กให้อุปกรณ์ลูกข่ายอัตโนมัติ (DORA Process)</td>
+                            </tr>
+                            <tr class="hover:bg-emerald-50/50">
+                                <td class="p-3 font-mono font-bold text-slate-700">Port 22</td>
+                                <td class="p-3 font-bold">SSH</td>
+                                <td class="p-3 font-mono">TCP</td>
+                                <td class="p-3">รีโมทคอนโทรลเข้าควบคุมเซิร์ฟเวอร์แบบเข้ารหัสความปลอดภัยสูง</td>
+                            </tr>
+                            <tr class="hover:bg-emerald-50/50">
+                                <td class="p-3 font-mono font-bold text-slate-700">Port 20 / 21</td>
+                                <td class="p-3 font-bold">FTP</td>
+                                <td class="p-3 font-mono">TCP</td>
+                                <td class="p-3">โอนย้ายไฟล์ข้อมูลระหว่างไคลเอนต์กับเซิร์ฟเวอร์</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 5: Network Diagnostic CLI Commands -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center text-sm shadow-md">3.5</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">คำสั่ง Command Line พื้นฐานสำหรับการตรวจสอบและแก้ปัญหาเครือข่าย</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs sm:text-sm">
+                    <div class="bg-slate-900 text-white p-4 rounded-2xl border border-slate-700 font-mono">
+                        <div class="flex items-center justify-between text-emerald-400 font-bold mb-2">
+                            <span>> ping &lt;target_ip&gt;</span>
+                            <i class="fa-solid fa-terminal"></i>
+                        </div>
+                        <p class="text-slate-300 font-sans text-xs">
+                            ส่งแพ็กเกจ ICMP Echo Request ไปทดสอบว่าเครื่องปลายทางยังเปิดอยู่และตอบสนองหรือไม่ พร้อมวัดความหน่วง (Latency ms)
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900 text-white p-4 rounded-2xl border border-slate-700 font-mono">
+                        <div class="flex items-center justify-between text-cyan-400 font-bold mb-2">
+                            <span>> tracert &lt;domain&gt;</span>
+                            <i class="fa-solid fa-terminal"></i>
+                        </div>
+                        <p class="text-slate-300 font-sans text-xs">
+                            แกะรอยเส้นทางการเดินทางของแพ็กเกจข้อมูลว่าวิ่งผ่านเราเตอร์ตัวไหนบ้าง (Hop-by-Hop) เพื่อหาจุดที่ระบบล่ม
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900 text-white p-4 rounded-2xl border border-slate-700 font-mono">
+                        <div class="flex items-center justify-between text-amber-400 font-bold mb-2">
+                            <span>> ipconfig /all</span>
+                            <i class="fa-solid fa-terminal"></i>
+                        </div>
+                        <p class="text-slate-300 font-sans text-xs">
+                            แสดงค่าคอนฟิก IP Address, Subnet Mask, Default Gateway, DNS Server และ MAC Address ของการ์ดแลนในเครื่อง
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900 text-white p-4 rounded-2xl border border-slate-700 font-mono">
+                        <div class="flex items-center justify-between text-purple-400 font-bold mb-2">
+                            <span>> nslookup &lt;domain&gt;</span>
+                            <i class="fa-solid fa-terminal"></i>
+                        </div>
+                        <p class="text-slate-300 font-sans text-xs">
+                            สืบค้นฐานข้อมูล DNS เพื่อดูว่าชื่อเว็บไซต์ดังกล่าวแปลงเป็นหมายเลข IP Address อะไร และใช้ DNS Server ตัวใด
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900 text-white p-4 rounded-2xl border border-slate-700 font-mono md:col-span-2">
+                        <div class="flex items-center justify-between text-rose-400 font-bold mb-2">
+                            <span>> netstat -ano</span>
+                            <i class="fa-solid fa-terminal"></i>
+                        </div>
+                        <p class="text-slate-300 font-sans text-xs">
+                            แสดงรายการเชื่อมต่อเครือข่ายทั้งหมดในปัจจุบัน ทั้งพอร์ตที่กำลังรอรับข้อมูล (LISTENING) และสถานะการเชื่อมต่อ (ESTABLISHED) พร้อมเลข PID
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 6: Summary & Key Takeaways Checklist -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border-2 border-emerald-300 bg-gradient-to-b from-emerald-50/30 to-white">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-200 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 text-white flex items-center justify-center text-lg shadow-md">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl sm:text-2xl font-black text-slate-900">สรุปประเด็นสำคัญประจำหน่วยที่ 3 (Key Takeaways)</h3>
+                        <p class="text-xs text-emerald-700">ทบทวนสาระสำคัญด้านการรับส่งข้อมูลและโพรโทคอล</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700">
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">OSI 7 Layers:</strong> Physical (Bits) -> Data Link (Frames) -> Network (Packets) -> Transport (Segments) -> Session -> Presentation -> Application
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">TCP vs UDP:</strong> TCP เชื่อถือได้สูงด้วย 3-Way Handshake (SYN-SYN/ACK-ACK) ส่วน UDP รวดเร็ว ความหน่วงต่ำ เหมาะกับ Streaming/Gaming
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">IPv4 vs IPv6:</strong> IPv4 มี 32 บิต (4 Octets) แบ่ง Class A, B, C ส่วน IPv6 มี 128 บิต เพื่อแก้ปัญหาไอพีไม่เพียงพอ
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">Well-Known Ports:</strong> HTTP (80), HTTPS (443 - ปลอดภัย), DNS (53), DHCP (67/68), SSH (22)
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">Private IP (RFC 1918):</strong> ช่วงไอพี 10.x.x.x, 172.16.x.x - 172.31.x.x, 192.168.x.x สงวนไว้ใช้ฟรีในเครือข่ายภายใน
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">Diagnostic Tools:</strong> `ping` เช็คการเชื่อมต่อ, `tracert` ดูเส้นทาง, `ipconfig` ดูไอพีเครื่อง, `nslookup` เช็ค DNS
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation Buttons -->
+        <section class="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
+            <a href="unit2.html" class="bg-white hover:bg-slate-100 text-slate-700 font-bold px-6 py-3.5 rounded-2xl border border-slate-300 shadow-sm flex items-center gap-2 text-xs sm:text-sm transition-all hover:-translate-x-1">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>บทเรียนก่อนหน้า (Unit 2: อุปกรณ์เครือข่าย)</span>
+            </a>
+            <a href="unit4.html" class="bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-bold px-7 py-3.5 rounded-2xl shadow-lg shadow-emerald-500/25 flex items-center gap-2 text-xs sm:text-sm transition-all hover:translate-x-1 active:scale-95">
+                <span>ไปบทเรียนถัดไป (Unit 4: การเข้าสายแลน)</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-8 px-4 text-xs text-center border-t border-slate-800">
+        <p>© 2026 Chaithawat Srisaenworakun. All rights reserved.</p>
+        <p class="text-slate-500 text-[11px] mt-1">Computer Network and Security Learning Platform for Google Sites</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+
+        function toggleSidebar() {
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        // Scroll Reveal Observer
+        document.addEventListener('DOMContentLoaded', () => {
+            const revealElements = document.querySelectorAll('.reveal-on-scroll');
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries, obs) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-revealed');
+                            obs.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+                revealElements.forEach(el => observer.observe(el));
+            } else {
+                revealElements.forEach(el => el.classList.add('is-revealed'));
+            }
+        });
+    </script>
+</body>
+</html>

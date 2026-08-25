@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>หน่วยที่ 2: อุปกรณ์เครือข่ายคอมพิวเตอร์ | สื่อการเรียนรู้ออนไลน์</title>
+    
+    <!-- Google Fonts: Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons 6.5.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Kanit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            200: '#bae6fd',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                            dark: '#0a192f'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f0f7ff;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .bg-grid-cyber {
+            background-image: 
+                linear-gradient(to right, rgba(14, 116, 144, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(14, 116, 144, 0.06) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        .unit-hero {
+            background: linear-gradient(135deg, #083344 0%, #0e7490 40%, #0284c7 100%);
+        }
+
+        .content-box {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px -4px rgba(14, 116, 144, 0.08);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+        }
+        .content-box:hover {
+            box-shadow: 0 16px 32px -8px rgba(14, 116, 144, 0.18);
+        }
+
+        .quiz-option {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+        .quiz-option:hover {
+            border-color: #0e7490;
+            background-color: #ecfeff;
+            transform: translateX(4px);
+        }
+        .quiz-option:has(input:checked) {
+            border-color: #0e7490;
+            background-color: #cffafe;
+            box-shadow: 0 4px 12px -2px rgba(14, 116, 144, 0.2);
+            transform: translateX(6px);
+        }
+
+        /* Scroll reveal */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .reveal-on-scroll.is-revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop-in {
+            animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, ::before, ::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .reveal-on-scroll {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-cyan-500 selection:text-white relative">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-white/95 backdrop-blur-md text-slate-800 sticky top-0 z-50 shadow-md border-b border-slate-200/80 w-full">
+        <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
+            
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-xl bg-slate-100 text-blue-600 hover:bg-blue-50 transition-all border border-slate-200">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                
+                <a href="index.html" class="flex items-center space-x-2.5 group">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-500 p-0.5 shadow-md flex items-center justify-center shrink-0">
+                        <div class="w-full h-full rounded-full bg-slate-900 flex items-center justify-center overflow-hidden border border-white">
+                            <i class="fa-solid fa-user-tie text-cyan-300 text-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-sm sm:text-base text-slate-900 leading-tight">
+                            CHAITHAWAT <span class="text-xs text-blue-600 font-semibold hidden sm:inline">| SRISAENWORAKUN</span>
+                        </h1>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium">Computer Network and Security Learning Hub</p>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="hidden lg:flex items-center space-x-1 font-medium text-xs">
+                <a href="index.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50/80 transition-all">
+                    <span>Home</span>
+                </a>
+                <a href="unit1.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50/80 transition-all">
+                    <span>รู้จักเครือข่ายคอมพิวเตอร์</span>
+                </a>
+                <a href="unit2.html" class="px-3.5 py-2 rounded-xl bg-cyan-600 text-white font-semibold shadow-sm transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-server text-xs"></i>
+                    <span>อุปกรณ์เครือข่าย</span>
+                </a>
+                <a href="unit3.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50/80 transition-all">
+                    <span>การรับส่งข้อมูล</span>
+                </a>
+                <a href="unit4.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50/80 transition-all">
+                    <span>การเข้าสายแลน</span>
+                </a>
+                <a href="unit5.html" class="px-3 py-2 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50/80 transition-all">
+                    <span>ความปลอดภัย</span>
+                </a>
+            </nav>
+
+            <div class="flex items-center space-x-2">
+                <a href="unit3.html" class="bg-gradient-to-r from-cyan-600 to-blue-500 hover:from-cyan-700 hover:to-blue-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-full transition-all shadow-md flex items-center gap-1.5 active:scale-95">
+                    <span>บทถัดไป (Unit 3)</span>
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Off-Canvas Sidebar -->
+    <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 hidden transition-opacity"></div>
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-slate-900 text-white flex flex-col justify-between z-50 shadow-2xl border-r border-slate-800 overflow-y-auto transform -translate-x-full transition-transform duration-300 ease-in-out">
+        <div class="p-5">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
+                <span class="text-xs font-bold text-cyan-400 tracking-wider uppercase"><i class="fa-solid fa-compass mr-1"></i> เมนูบทเรียน</span>
+                <button onclick="toggleSidebar()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <nav class="space-y-1.5 text-xs font-medium">
+                <a href="index.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all">
+                    <i class="fa-solid fa-house w-5 text-center"></i>
+                    <span>หน้าหลัก (Home)</span>
+                </a>
+                <a href="unit1.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition-all">
+                    <i class="fa-solid fa-diagram-project text-blue-400 w-5 text-center"></i>
+                    <span>1. รู้จักเครือข่ายคอมพิวเตอร์</span>
+                </a>
+                <a href="unit2.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl bg-cyan-600 text-white shadow-md">
+                    <i class="fa-solid fa-server text-cyan-200 w-5 text-center"></i>
+                    <span>2. อุปกรณ์เครือข่ายคอมพิวเตอร์</span>
+                </a>
+                <a href="unit3.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition-all">
+                    <i class="fa-solid fa-right-left text-emerald-400 w-5 text-center"></i>
+                    <span>3. การรับส่งข้อมูลบนเครือข่าย</span>
+                </a>
+                <a href="unit4.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition-all">
+                    <i class="fa-solid fa-ethernet text-amber-400 w-5 text-center"></i>
+                    <span>4. การเข้าสายแลนเชื่อมต่อระบบ</span>
+                </a>
+                <a href="unit5.html" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition-all">
+                    <i class="fa-solid fa-shield-halved text-rose-400 w-5 text-center"></i>
+                    <span>5. ความปลอดภัยบนระบบเครือข่าย</span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-400">
+            <p class="text-[10px] text-slate-500 text-center">© 2026 Chaithawat Srisaenworakun</p>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="w-full flex-1 bg-grid-cyber pb-16">
+        
+        <!-- Unit Hero Banner -->
+        <section class="max-w-7xl mx-auto px-4 pt-4 pb-6">
+            <div class="unit-hero text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden border border-cyan-400/30">
+                <div class="relative z-10 max-w-3xl">
+                    <div class="flex items-center space-x-2 text-xs text-cyan-200 mb-3">
+                        <a href="index.html" class="hover:underline flex items-center gap-1"><i class="fa-solid fa-house"></i> หน้าหลัก</a>
+                        <span>/</span>
+                        <span class="text-white font-semibold">หน่วยที่ 2</span>
+                    </div>
+
+                    <span class="inline-block bg-cyan-500/40 border border-cyan-300/40 text-cyan-100 text-xs font-bold px-3 py-1 rounded-full mb-3">
+                        UNIT 02 • ฮาร์ดแวร์ระบบเครือข่าย
+                    </span>
+                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-white drop-shadow-md">
+                        อุปกรณ์เครือข่ายคอมพิวเตอร์
+                    </h1>
+                    <p class="text-base sm:text-lg text-cyan-100 mt-2 font-light">
+                        Network Hardware Devices: Router, Switch, AP, Gateway and NIC
+                    </p>
+                    
+                    <div class="mt-5 flex flex-wrap items-center gap-4 text-xs text-cyan-100/90 pt-3 border-t border-cyan-300/20">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock text-cyan-300"></i> เวลาเรียน: 2.5 ชั่วโมง</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-brands fa-youtube text-red-400"></i> วิดีโอบทเรียน</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-microchip text-cyan-300"></i> 6 หมวดอุปกรณ์หลัก</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-graduation-cap text-cyan-300"></i> สรุปสาระสำคัญ</span>
+                    </div>
+                </div>
+
+                <i class="fa-solid fa-server absolute -right-6 -bottom-8 text-[220px] text-cyan-400/10 pointer-events-none"></i>
+            </div>
+        </section>
+
+        <!-- Learning Objectives Card -->
+        <section class="max-w-7xl mx-auto px-4 mb-8">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border-2 border-cyan-200">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-600 text-white flex items-center justify-center text-lg shadow-md">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">จุดประสงค์การเรียนรู้</h2>
+                        <p class="text-xs text-cyan-700">เมื่อศึกษาหน่วยนี้แล้ว ผู้เรียนจะมีความรู้ความสามารถดังนี้</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700">
+                    <div class="flex items-start space-x-3 bg-cyan-50/60 p-3.5 rounded-2xl border border-cyan-100">
+                        <i class="fa-solid fa-circle-check text-cyan-600 text-base mt-0.5 shrink-0"></i>
+                        <span>1. ระบุหน้าที่และหลักการทำงานของอุปกรณ์เครือข่ายแต่ละประเภทได้อย่างถูกต้อง</span>
+                    </div>
+                    <div class="flex items-start space-x-3 bg-cyan-50/60 p-3.5 rounded-2xl border border-cyan-100">
+                        <i class="fa-solid fa-circle-check text-cyan-600 text-base mt-0.5 shrink-0"></i>
+                        <span>2. อธิบายความแตกต่างระหว่าง Switch และ Hub พร้อมเปรียบเทียบเรื่อง Collision Domain ได้</span>
+                    </div>
+                    <div class="flex items-start space-x-3 bg-cyan-50/60 p-3.5 rounded-2xl border border-cyan-100">
+                        <i class="fa-solid fa-circle-check text-cyan-600 text-base mt-0.5 shrink-0"></i>
+                        <span>3. เข้าใจการทำงานของ Router ในการค้นหาเส้นทางและการแจก IP Address (DHCP)</span>
+                    </div>
+                    <div class="flex items-start space-x-3 bg-cyan-50/60 p-3.5 rounded-2xl border border-cyan-100">
+                        <i class="fa-solid fa-circle-check text-cyan-600 text-base mt-0.5 shrink-0"></i>
+                        <span>4. เลือกใช้อุปกรณ์เครือข่ายให้เหมาะสมกับขนาดและความต้องการขององค์กรได้</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Learning Section (YouTube Embed) -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border-2 border-cyan-300 bg-gradient-to-b from-cyan-50/40 via-white to-sky-50/20 shadow-lg">
+                <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-200 mb-6 gap-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-500 text-white flex items-center justify-center text-xl shadow-md shadow-red-500/20">
+                            <i class="fa-brands fa-youtube"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-black text-slate-900">วิดีโอเสริมการเรียนรู้: อุปกรณ์เครือข่ายคอมพิวเตอร์</h3>
+                            <p class="text-xs text-cyan-800">ทำความเข้าใจหน้าที่และบทบาทของอุปกรณ์ Network Hardware แต่ละชนิดอย่างเข้าใจง่าย</p>
+                        </div>
+                    </div>
+                    <span class="self-start md:self-auto text-xs bg-red-100 text-red-700 font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-red-200">
+                        <i class="fa-solid fa-play text-[10px]"></i> บทเรียนมัลติมีเดีย
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <!-- Responsive YouTube Embed -->
+                    <div class="lg:col-span-8">
+                        <div class="relative w-full rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-slate-900" style="padding-top: 56.25%;">
+                            <iframe 
+                                class="absolute top-0 left-0 w-full h-full"
+                                src="https://www.youtube.com/embed/fgUY3Qq-qhw" 
+                                title="อุปกรณ์เครือข่ายคอมพิวเตอร์" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                referrerpolicy="strict-origin-when-cross-origin"
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        <div class="mt-3 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-cyan-100 text-xs text-slate-500">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-info text-cyan-600"></i> หากมีข้อจำกัดด้านเบราว์เซอร์หรือเครื่องขัดข้อง สามารถเปิดดูผ่าน YouTube ได้โดยตรง:</span>
+                            <a href="https://www.youtube.com/watch?v=fgUY3Qq-qhw" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white font-bold px-3.5 py-1.5 rounded-xl shadow transition-all active:scale-95 text-xs">
+                                <i class="fa-brands fa-youtube"></i>
+                                <span>เปิดดูบน YouTube</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Video Highlights & Guide -->
+                    <div class="lg:col-span-4 space-y-3.5 text-xs sm:text-sm">
+                        <div class="bg-white p-4 rounded-2xl border border-cyan-100 shadow-sm space-y-2">
+                            <h4 class="font-bold text-slate-900 flex items-center gap-2 text-sm">
+                                <i class="fa-solid fa-lightbulb text-amber-500"></i> ประเด็นสำคัญในคลิปวิดีโอ:
+                            </h4>
+                            <ul class="space-y-2 text-slate-600 text-xs">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-play text-red-500 mt-0.5 shrink-0"></i>
+                                    <span>หน้าที่หลักของการ์ดแลน (NIC) และ Router</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-play text-red-500 mt-0.5 shrink-0"></i>
+                                    <span>ความแตกต่างในการรับส่งข้อมูลระหว่าง Hub และ Switch</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-play text-red-500 mt-0.5 shrink-0"></i>
+                                    <span>การกระจายสัญญาณไร้สายด้วย Access Point (AP)</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="p-4 bg-gradient-to-br from-slate-900 via-cyan-950 to-cyan-900 text-white rounded-2xl shadow-md space-y-1 border border-cyan-500/30">
+                            <div class="flex items-center gap-2 text-cyan-300 font-bold text-xs">
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                                <span>คำแนะนำสำหรับผู้เรียน</span>
+                            </div>
+                            <p class="text-[11px] text-slate-200 leading-relaxed">
+                                เมื่อดูคลิปจบแล้ว แนะนำให้อ่านรายละเอียดทางเทคนิค เช่น 48-bit MAC Address, Collision Domain และมาตรฐาน Wi-Fi 6/7 ในหัวข้อถัดไป
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 1: NIC and MAC Address -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-cyan-600 text-white font-bold flex items-center justify-center text-sm shadow-md">2.1</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">การ์ดแลน (NIC) และหมายเลขประจำตัวทางกายภาพ (MAC Address)</h3>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center mb-6">
+                    <div class="lg:col-span-7 space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        <p>
+                            <strong class="text-slate-900 font-bold">การ์ดแลน (Network Interface Card - NIC)</strong> หรือ Network Adapter คือ แผงวงจรฮาร์ดแวร์ที่ติดตั้งอยู่ในคอมพิวเตอร์หรืออุปกรณ์ดิจิทัล ทำหน้าที่เป็นสะพานเชื่อมต่อระหว่างอุปกรณ์กับสื่อกลางส่งข้อมูล (ทั้งแบบสาย RJ-45 และแบบไร้สาย Wi-Fi) โดยแปลงข้อมูลดิจิทัลภายในเครื่องให้เป็นสัญญาณไฟฟ้า สัญญาณแสง หรือคลื่นวิทยุ
+                        </p>
+                        <p>
+                            บนการ์ดแลนทุกใบจากโรงงาน จะถูกบันทึกหมายเลขประจำตัวฮาร์ดแวร์ที่ไม่ซ้ำกันในโลก เรียกว่า <strong class="text-cyan-800">MAC Address (Media Access Control Address)</strong> หรือ Physical Address ขนาด <strong>48 บิต (6 ไบต์)</strong> เขียนแสดงในรูปเลขฐานสิบหก (Hexadecimal) คั่นด้วยเครื่องหมายโคลอนหรือขีด เช่น <code class="bg-cyan-50 text-cyan-800 px-2 py-0.5 rounded font-mono font-bold">00:1A:2B:3C:4D:5E</code>
+                        </p>
+                    </div>
+
+                    <div class="lg:col-span-5 flex justify-center">
+                        <div class="w-full max-w-sm rounded-2xl bg-gradient-to-tr from-slate-900 via-cyan-950 to-cyan-800 p-6 text-white text-center shadow-xl border border-cyan-500/30">
+                            <i class="fa-solid fa-microchip text-6xl text-cyan-400 mb-3 animate-float-gentle"></i>
+                            <h4 class="font-bold text-lg text-white">48-bit MAC Address Structure</h4>
+                            <div class="mt-3 grid grid-cols-2 gap-2 text-xs text-left">
+                                <div class="bg-cyan-900/60 p-2.5 rounded-xl border border-cyan-400/30">
+                                    <span class="text-[10px] text-cyan-300 font-bold block">24 บิตแรก (3 ไบต์)</span>
+                                    <strong class="text-white">OUI (Organizationally Unique Identifier)</strong>
+                                    <p class="text-[10px] text-slate-300 mt-1">รหัสระบุบริษัทผู้ผลิต เช่น Cisco, Apple, Intel</p>
+                                </div>
+                                <div class="bg-blue-900/60 p-2.5 rounded-xl border border-blue-400/30">
+                                    <span class="text-[10px] text-blue-300 font-bold block">24 บิตหลัง (3 ไบต์)</span>
+                                    <strong class="text-white">Device Identifier (NIC Serial)</strong>
+                                    <p class="text-[10px] text-slate-300 mt-1">หมายเลขซีเรียลเฉพาะของแผงวงจรแต่ละใบ</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 2: Hub vs Switch vs Layer 3 Switch -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-cyan-600 text-white font-bold flex items-center justify-center text-sm shadow-md">2.2</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">อุปกรณ์รวมสัญญาณ: ฮับ (Hub) vs สวิตช์ (Switch) vs Layer 3 Switch</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 text-xs sm:text-sm">
+                    <!-- Hub -->
+                    <div class="bg-rose-50/60 p-5 rounded-2xl border-2 border-rose-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center space-x-2 text-rose-700 font-bold mb-2 text-base">
+                                <i class="fa-solid fa-circle-xmark text-lg"></i>
+                                <h4>1. Hub (ฮับ - เทคโนโลยีเดิม)</h4>
+                            </div>
+                            <span class="text-[10px] font-bold bg-rose-200 text-rose-900 px-2 py-0.5 rounded uppercase">Physical Layer (Layer 1)</span>
+                            <p class="text-slate-600 leading-relaxed mt-3">
+                                ส่งข้อมูลแบบ <strong>Broadcast (กระจายสัญญาณออกทุกพอร์ต)</strong> ไม่มีความฉลาด ทุกอุปกรณ์แชร์ Collision Domain เดียวกัน ทำให้ข้อมูลชนกันบ่อย ความเร็วลดลงอย่างรวดเร็ว ทำงานแบบ Half-Duplex
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-rose-200 text-[11px] text-rose-800 font-semibold">
+                            ⚠️ ปัจจุบันยกเลิกการใช้งานแล้ว ถูกแทนที่ด้วย Switch ทั้งหมด
+                        </div>
+                    </div>
+
+                    <!-- L2 Switch -->
+                    <div class="bg-emerald-50/60 p-5 rounded-2xl border-2 border-emerald-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center space-x-2 text-emerald-700 font-bold mb-2 text-base">
+                                <i class="fa-solid fa-circle-check text-lg"></i>
+                                <h4>2. Layer 2 Switch (สวิตช์มาตรฐาน)</h4>
+                            </div>
+                            <span class="text-[10px] font-bold bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded uppercase">Data Link Layer (Layer 2)</span>
+                            <p class="text-slate-600 leading-relaxed mt-3">
+                                ส่งข้อมูลแบบ <strong>Unicast (เจาะจงเฉพาะพอร์ตปลายทาง)</strong> โดยเรียนรู้และสร้าง <em>MAC Address Table</em> แยก Collision Domain ทุกพอร์ต ทำงานแบบ Full-Duplex ข้อมูลไม่ชนกัน
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-emerald-200 text-[11px] text-emerald-800 font-semibold">
+                            ✅ มาตรฐานหลักในระบบแลน (1Gbps, 2.5Gbps, 10Gbps)
+                        </div>
+                    </div>
+
+                    <!-- L3 Switch / Managed Switch -->
+                    <div class="bg-blue-50/60 p-5 rounded-2xl border-2 border-blue-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center space-x-2 text-blue-700 font-bold mb-2 text-base">
+                                <i class="fa-solid fa-layer-group text-lg"></i>
+                                <h4>3. Managed & Layer 3 Switch</h4>
+                            </div>
+                            <span class="text-[10px] font-bold bg-blue-200 text-blue-900 px-2 py-0.5 rounded uppercase">Layer 2 + Layer 3 (IP Routing)</span>
+                            <p class="text-slate-600 leading-relaxed mt-3">
+                                สวิตช์ระดับองค์กรที่สามารถตั้งค่าแบ่งวงเสมือน <strong>VLAN (Virtual LAN)</strong>, รองรับการจ่ายไฟผ่านสายแลน <strong>PoE (Power over Ethernet)</strong> และทำการ Routing ข้าม VLAN ได้ด้วยความเร็วฮาร์ดแวร์ (ASIC)
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-blue-200 text-[11px] text-blue-800 font-semibold">
+                            ⚡ นิยมใช้เป็น Core Switch / Distribution Switch ในองค์กร
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Collision Domain vs Broadcast Domain Diagram -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <h4 class="font-bold text-slate-900 text-xs sm:text-sm mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-lightbulb text-amber-500"></i> สรุปข้อแตกต่างเรื่อง Collision Domain และ Broadcast Domain:
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-700">
+                        <div class="bg-white p-3 rounded-xl border border-slate-200">
+                            <strong class="text-rose-700">Collision Domain (ขอบเขตการชนกันของข้อมูล):</strong> Hub มี 1 Collision Domain รวมกันทั้งเครื่อง | Switch แยก 1 Collision Domain ต่อ 1 พอร์ต (ไม่ชนกัน)
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-slate-200">
+                            <strong class="text-cyan-700">Broadcast Domain (ขอบเขตการกระจายสัญญาณ):</strong> Switch ทุกพอร์ตอยู่ใน Broadcast Domain เดียวกัน (ยกเว้นแบ่ง VLAN) | Router ทำหน้าที่ตัดและแยก Broadcast Domain
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 3: Router, Gateway & Fiber ONT/Modem -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-cyan-600 text-white font-bold flex items-center justify-center text-sm shadow-md">2.3</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">เราเตอร์ (Router), เกตเวย์ (Gateway) และโมเด็มไฟเบอร์ (Fiber ONT)</h3>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center mb-6">
+                    <div class="lg:col-span-7 space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                        <p>
+                            <strong class="text-slate-900 font-bold">เราเตอร์ (Router)</strong> เป็นอุปกรณ์ที่ทำงานในระดับ <span class="bg-cyan-100 text-cyan-800 font-semibold px-2 py-0.5 rounded">Network Layer (Layer 3)</span> ทำหน้าที่เชื่อมโยงเครือข่ายคนละวง (ต่าง Subnet) หรือเชื่อมต่อ LAN ภายในบ้าน/องค์กร เข้ากับเครือข่าย WAN ภายนอก (Internet) โดยอ่านหมายเลข IP Address ปลายทาง และเปิดดูตาราง <strong>Routing Table</strong> เพื่อค้นหาเส้นทางที่เร็วที่สุด (Best Path)
+                        </p>
+                        
+                        <div class="p-4 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl border border-cyan-200 space-y-2">
+                            <h4 class="font-bold text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-gear text-cyan-600"></i> ฟังก์ชันสำคัญของเราเตอร์ในปัจจุบัน:
+                            </h4>
+                            <ul class="space-y-1.5 list-disc list-inside text-slate-700 text-xs sm:text-sm">
+                                <li><strong class="text-slate-900">NAT (Network Address Translation):</strong> แปลง Private IP หลายเครื่องในบ้านให้ใช้ Public IP เดียวกันออกอินเทอร์เน็ต</li>
+                                <li><strong class="text-slate-900">DHCP Server:</strong> จ่ายหมายเลข IP Address, Subnet Mask และ Gateway ให้ลูกข่ายอัตโนมัติ</li>
+                                <li><strong class="text-slate-900">Default Gateway:</strong> ประตูทางออกหลักของแพ็กเกจข้อมูลเมื่อต้องการส่งออกนอกเครือข่ายท้องถิ่น</li>
+                                <li><strong class="text-slate-900">QoS (Quality of Service):</strong> จัดลำดับความสำคัญของแบนด์วิดท์ เช่น ให้ความสำคัญกับเสียง Voice/Video ก่อนดาวน์โหลดไฟล์</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-5 space-y-4">
+                        <!-- ONT Card -->
+                        <div class="bg-slate-900 text-white p-5 rounded-2xl border border-cyan-500/40 shadow-xl">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-10 h-10 rounded-xl bg-cyan-600 flex items-center justify-center text-white text-lg">
+                                    <i class="fa-solid fa-tower-broadcast"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-white">Fiber ONT / ONU (Modem)</h4>
+                                    <p class="text-[11px] text-cyan-300">Optical Network Terminal</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                ทำหน้าที่แปลงสัญญาณแสง (Light Pulse) ผ่านสายใยแก้วนำแสง (Fiber Optic GPON) จาก ISP ให้กลายเป็นสัญญาณไฟฟ้าดิจิทัล (Ethernet) ก่อนส่งต่อให้เราเตอร์
+                            </p>
+                        </div>
+
+                        <!-- Gateway Card -->
+                        <div class="bg-white p-5 rounded-2xl border-2 border-slate-200 shadow-sm">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-door-open"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-900">เกตเวย์ (Gateway)</h4>
+                                    <p class="text-[11px] text-blue-600">Protocol Translator</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                ด่านเชื่อมต่อและแปลงรูปแบบโพรโทคอลระหว่าง 2 เครือข่ายที่ใช้สถาปัตยกรรมต่างกันอย่างสิ้นเชิง เช่น เชื่อมโยงเครือข่ายองค์กรเข้ากับระบบเมนเฟรม หรือ IoT Gateway
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 4: Wireless AP & Wi-Fi Standards (Wi-Fi 5, 6, 7) -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-cyan-600 text-white font-bold flex items-center justify-center text-sm shadow-md">2.4</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">อุปกรณ์เชื่อมต่อไร้สาย (Access Point) และมาตรฐาน Wi-Fi</h3>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <!-- Access Point Types -->
+                    <div class="lg:col-span-1 bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-600 flex items-center justify-center text-2xl mb-3 shadow-inner">
+                                <i class="fa-solid fa-wifi animate-radar"></i>
+                            </div>
+                            <h4 class="font-black text-slate-900 text-base">Access Point (AP)</h4>
+                            <p class="text-xs text-slate-500 font-medium mb-3">สะพานเชื่อมสัญญาณมีสายสู่ไร้สาย</p>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                เปลี่ยนสัญญาณ Ethernet จากสายแลน ให้กลายเป็นคลื่นวิทยุเพื่อให้อุปกรณ์เคลื่อนที่สามารถเชื่อมต่อเครือข่ายได้ ในองค์กรจะใช้ Controller ควบคุมหลาย AP พร้อมกัน (Centralized AP) หรือทำระบบ <strong>Mesh Wi-Fi (Seamless Roaming)</strong> เพื่อให้เดินใช้งานได้ทั่วอาคารโดยสัญญาณไม่หลุด
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Wi-Fi Frequency Bands -->
+                    <div class="lg:col-span-2 space-y-3">
+                        <h4 class="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-signal text-cyan-600"></i> ย่านความถี่คลื่นวิทยุ Wi-Fi (Frequency Bands):
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                <span class="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">2.4 GHz</span>
+                                <h5 class="font-bold text-slate-900 mt-2">ระยะไกล ทะลุสิ่งกีดขวางดี</h5>
+                                <p class="text-slate-500 mt-1">ความเร็วปานกลาง (~300-600 Mbps) มีสัญญาณรบกวนมาก เหมาะกับอุปกรณ์ IoT และสมาร์ตโฮม</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                <span class="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">5.0 GHz</span>
+                                <h5 class="font-bold text-slate-900 mt-2">ความเร็วสูง แบนด์วิดท์กว้าง</h5>
+                                <p class="text-slate-500 mt-1">ความเร็วสูงมาก (~1.3 - 4.8 Gbps) สัญญาณรบกวนน้อย แต่ทะลุกำแพงหนาได้น้อยกว่า</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">6.0 GHz (Wi-Fi 6E/7)</span>
+                                <h5 class="font-bold text-slate-900 mt-2">ช่องสัญญาณใหม่ ไร้การรบกวน</h5>
+                                <p class="text-slate-500 mt-1">ความเร็วทะลุ 10-40 Gbps Latency ต่ำพิเศษ เหมาะสำหรับ AR/VR, 8K Video และ Gaming</p>
+                            </div>
+                        </div>
+
+                        <!-- Wi-Fi Generations Comparison Table -->
+                        <div class="overflow-x-auto mt-4">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-800 text-white">
+                                        <th class="p-2.5 rounded-tl-xl">มาตรฐาน IEEE</th>
+                                        <th class="p-2.5">ชื่อทางการตลาด</th>
+                                        <th class="p-2.5">ย่านความถี่</th>
+                                        <th class="p-2.5 rounded-tr-xl">ความเร็วสูงสุดตามทฤษฎี</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
+                                    <tr>
+                                        <td class="p-2.5 font-mono font-bold">802.11ac</td>
+                                        <td class="p-2.5 font-semibold text-blue-700">Wi-Fi 5</td>
+                                        <td class="p-2.5">5 GHz</td>
+                                        <td class="p-2.5">สูงสุด 3.5 Gbps</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2.5 font-mono font-bold">802.11ax</td>
+                                        <td class="p-2.5 font-semibold text-emerald-700">Wi-Fi 6 / 6E</td>
+                                        <td class="p-2.5">2.4 / 5 / 6 GHz</td>
+                                        <td class="p-2.5">สูงสุด 9.6 Gbps (OFDMA, MU-MIMO)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2.5 font-mono font-bold">802.11be</td>
+                                        <td class="p-2.5 font-semibold text-cyan-700">Wi-Fi 7 (ล่าสุด)</td>
+                                        <td class="p-2.5">2.4 / 5 / 6 GHz</td>
+                                        <td class="p-2.5 font-bold text-cyan-700">สูงสุด 46 Gbps (320MHz, 4K-QAM, MLO)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 5: Specialized Hardware: Hardware Firewall, Rack & Cable Management -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-cyan-600 text-white font-bold flex items-center justify-center text-sm shadow-md">2.5</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">อุปกรณ์ความปลอดภัยและโครงสร้างพื้นฐานห้องเซิร์ฟเวอร์</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs sm:text-sm">
+                    <!-- Hardware Firewall -->
+                    <div class="bg-white rounded-2xl p-5 border-2 border-rose-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl mb-3 shadow-inner">
+                                <i class="fa-solid fa-shield-halved animate-pulse"></i>
+                            </div>
+                            <h4 class="font-black text-slate-900 text-base">1. Hardware Firewall (NGFW)</h4>
+                            <p class="text-xs text-rose-700 font-semibold mb-2">Next-Generation Firewall</p>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                อุปกรณ์ความปลอดภัยเฉพาะทางที่คั่นกลางระหว่างเครือข่ายภายในกับภายนอก ทำหน้าที่ตรวจสอบแพ็กเกจข้อมูลแบบละเอียด (Deep Packet Inspection), กรองมัลแวร์, ป้องกันการโจมตี IPS/IDS และทำ VPN Server
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Patch Panel & 19" Rack -->
+                    <div class="bg-white rounded-2xl p-5 border-2 border-slate-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-800 flex items-center justify-center text-xl mb-3 shadow-inner">
+                                <i class="fa-solid fa-server"></i>
+                            </div>
+                            <h4 class="font-black text-slate-900 text-base">2. Patch Panel & Server Rack</h4>
+                            <p class="text-xs text-slate-500 font-semibold mb-2">ตู้แร็คมาตรฐาน 19 นิ้วและแผงพักสาย</p>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                แผงกระจายสายแลน (Patch Panel) ทำหน้าที่รวมสายแลนถาวรจากทุกห้องเข้ามายังตู้แร็ค (Server Rack) เพื่อให้การเชื่อมต่อเข้ากับสวิตช์ด้วยสาย Patch Cord เป็นระเบียบ ซ่อมบำรุงและตรวจเช็คสัญญาณได้ง่าย
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- UPS & Power Management -->
+                    <div class="bg-white rounded-2xl p-5 border-2 border-amber-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-3 shadow-inner">
+                                <i class="fa-solid fa-car-battery"></i>
+                            </div>
+                            <h4 class="font-black text-slate-900 text-base">3. UPS (เครื่องสำรองไฟฟ้า)</h4>
+                            <p class="text-xs text-amber-700 font-semibold mb-2">Uninterruptible Power Supply</p>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                จ่ายกระแสไฟฟ้าสำรองเมื่อไฟดับหรือไฟตก ป้องกันอุปกรณ์เน็ตเวิร์กและเซิร์ฟเวอร์ดับกะทันหัน ซึ่งอาจทำให้ข้อมูลเสียหาย พร้อมระบบปรับแรงดันไฟฟ้าอัตโนมัติ (AVR) ยืดอายุการใช้งานฮาร์ดแวร์
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 6: Summary Matrix of Network Hardware -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border border-slate-200">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 mb-6">
+                    <span class="w-8 h-8 rounded-xl bg-cyan-600 text-white font-bold flex items-center justify-center text-sm shadow-md">2.6</span>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">ตารางสรุปเปรียบเทียบอุปกรณ์เครือข่ายตามระดับชั้น OSI (Hardware Summary Matrix)</h3>
+                </div>
+
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead>
+                            <tr class="bg-cyan-700 text-white">
+                                <th class="p-3.5 rounded-tl-2xl font-semibold">ชื่ออุปกรณ์</th>
+                                <th class="p-3.5 font-semibold">OSI Layer</th>
+                                <th class="p-3.5 font-semibold">หน่วยข้อมูล (PDU)</th>
+                                <th class="p-3.5 font-semibold">การระบุตำแหน่ง (Addressing)</th>
+                                <th class="p-3.5 rounded-tr-2xl font-semibold">หน้าที่หลัก</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 text-slate-700 bg-white">
+                            <tr class="hover:bg-cyan-50/50">
+                                <td class="p-3.5 font-bold text-slate-900">Repeater / Hub</td>
+                                <td class="p-3.5">Layer 1 (Physical)</td>
+                                <td class="p-3.5 font-mono">Bits (0, 1)</td>
+                                <td class="p-3.5 text-slate-400">ไม่มี (กระจายทุกพอร์ต)</td>
+                                <td class="p-3.5">ขยายสัญญาณไฟฟ้าและรวมสาย</td>
+                            </tr>
+                            <tr class="hover:bg-cyan-50/50">
+                                <td class="p-3.5 font-bold text-emerald-700">Bridge / Switch</td>
+                                <td class="p-3.5 font-semibold text-emerald-800">Layer 2 (Data Link)</td>
+                                <td class="p-3.5 font-mono">Frames</td>
+                                <td class="p-3.5 font-bold text-slate-800">MAC Address (48 บิต)</td>
+                                <td class="p-3.5">สลับส่งข้อมูลตรงตาม MAC Address ปลายทาง</td>
+                            </tr>
+                            <tr class="hover:bg-cyan-50/50">
+                                <td class="p-3.5 font-bold text-blue-700">Router / L3 Switch</td>
+                                <td class="p-3.5 font-semibold text-blue-800">Layer 3 (Network)</td>
+                                <td class="p-3.5 font-mono">Packets</td>
+                                <td class="p-3.5 font-bold text-slate-800">IP Address (IPv4 / IPv6)</td>
+                                <td class="p-3.5">ค้นหาเส้นทางข้ามเครือข่าย, NAT, DHCP, กรองทราฟฟิก</td>
+                            </tr>
+                            <tr class="hover:bg-cyan-50/50">
+                                <td class="p-3.5 font-bold text-rose-700">Gateway / NGFW</td>
+                                <td class="p-3.5 font-semibold text-rose-800">Layer 4 - Layer 7</td>
+                                <td class="p-3.5 font-mono">Segments / Data</td>
+                                <td class="p-3.5">IP + Port Number + Application</td>
+                                <td class="p-3.5">แปลงโพรโทคอล, ตรวจสอบความปลอดภัยเชิงลึก (DPI)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topic 7: Summary & Key Takeaways Checklist -->
+        <section class="max-w-7xl mx-auto px-4 mb-8 reveal-on-scroll">
+            <div class="content-box rounded-3xl p-6 sm:p-8 border-2 border-cyan-300 bg-gradient-to-b from-cyan-50/30 to-white">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-200 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white flex items-center justify-center text-lg shadow-md">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl sm:text-2xl font-black text-slate-900">สรุปประเด็นสำคัญประจำหน่วยที่ 2 (Key Takeaways)</h3>
+                        <p class="text-xs text-cyan-700">ทบทวนสาระสำคัญเกี่ยวกับฮาร์ดแวร์เครือข่าย</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700">
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-cyan-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">NIC & MAC Address:</strong> การ์ดแลนมี MAC Address ขนาด 48 บิต ไม่ซ้ำกันในโลก โดย 24 บิตแรกคือ OUI (ผู้ผลิต) และ 24 บิตหลังคือรหัสอุปกรณ์
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-cyan-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">Switch vs Hub:</strong> Switch แยก Collision Domain ทุกพอร์ตและส่งข้อมูลเฉพาะเจาะจงผ่าน MAC Table ส่วน Hub เป็น Broadcast ทำให้ข้อมูลชนกันบ่อย
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-cyan-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">Router (Layer 3):</strong> ทำหน้าที่เชื่อมต่อเครือข่ายต่างวง หาเส้นทางส่งแพ็กเกจด้วย IP Address และทำหน้าที่ NAT แปลง IP ออกเน็ต
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-cyan-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">Fiber ONT:</strong> แปลงสัญญาณแสงเลเซอร์จากสายไฟเบอร์ออปติก GPON ให้เป็นสัญญาณดิจิทัลเพื่อส่งเข้า Router
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-cyan-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">Wi-Fi Standards:</strong> Wi-Fi 6 (802.11ax) และ Wi-Fi 7 (802.11be) รองรับคลื่น 2.4/5/6 GHz แบนด์วิดท์กว้างพิเศษและความหน่วงต่ำ
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-cyan-600 text-lg mt-0.5 shrink-0"></i>
+                        <div>
+                            <strong class="text-slate-900">Infrastructure:</strong> Patch Panel ช่วยจัดระเบียบสายแลนในตู้ Server Rack 19" และ UPS ป้องกันระบบดับเมื่อไฟฟ้ามีปัญหา
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation Buttons -->
+        <section class="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
+            <a href="unit1.html" class="bg-white hover:bg-slate-100 text-slate-700 font-bold px-6 py-3.5 rounded-2xl border border-slate-300 shadow-sm flex items-center gap-2 text-xs sm:text-sm transition-all hover:-translate-x-1">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>บทเรียนก่อนหน้า (Unit 1: รู้จักเครือข่าย)</span>
+            </a>
+            <a href="unit3.html" class="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-bold px-7 py-3.5 rounded-2xl shadow-lg shadow-cyan-500/25 flex items-center gap-2 text-xs sm:text-sm transition-all hover:translate-x-1 active:scale-95">
+                <span>ไปบทเรียนถัดไป (Unit 3: การรับส่งข้อมูล)</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-8 px-4 text-xs text-center border-t border-slate-800">
+        <p>© 2026 Chaithawat Srisaenworakun. All rights reserved.</p>
+        <p class="text-slate-500 text-[11px] mt-1">Computer Network and Security Learning Platform for Google Sites</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+
+        function toggleSidebar() {
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        // Scroll Reveal Observer
+        document.addEventListener('DOMContentLoaded', () => {
+            const revealElements = document.querySelectorAll('.reveal-on-scroll');
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries, obs) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-revealed');
+                            obs.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+                revealElements.forEach(el => observer.observe(el));
+            } else {
+                revealElements.forEach(el => el.classList.add('is-revealed'));
+            }
+        });
+    </script>
+</body>
+</html>
