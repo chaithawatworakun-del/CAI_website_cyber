@@ -21,7 +21,10 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Kanit', 'sans-serif'] }
+                    fontFamily: { sans: ['Kanit', 'sans-serif'] },
+                    colors: {
+                        cyber: { cyan: '#00f2fe', blue: '#4facfe', amber: '#f59e0b', dark: '#0a1128' }
+                    }
                 }
             }
         }
@@ -39,10 +42,90 @@
 
         .bg-grid-cyber {
             background-image: 
-                radial-gradient(rgba(14, 165, 233, 0.15) 1px, transparent 1px),
+                radial-gradient(rgba(245, 158, 11, 0.15) 1px, transparent 1px),
                 linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
             background-size: 28px 28px, 56px 56px, 56px 56px;
+        }
+
+        /* Smooth 60fps Keyframes for Video Motion Engine */
+        @keyframes orbitCut {
+            0% { transform: translateY(-14px) rotate(0deg); }
+            50% { transform: translateY(14px) rotate(180deg); }
+            100% { transform: translateY(-14px) rotate(360deg); }
+        }
+        .anim-orbit-cut {
+            animation: orbitCut 2.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+        }
+
+        @keyframes jacketSlide {
+            0% { transform: translateX(0px); opacity: 1; }
+            45%, 100% { transform: translateX(36px); opacity: 0.2; }
+        }
+        .anim-jacket-slide {
+            animation: jacketSlide 3.5s ease-in-out infinite;
+        }
+
+        @keyframes scissorTrim {
+            0%, 100% { transform: translateY(-28px) scale(0.9); opacity: 0; }
+            30%, 70% { transform: translateY(0px) scale(1); opacity: 1; }
+        }
+        .anim-scissor-trim {
+            animation: scissorTrim 3s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        }
+
+        @keyframes plugSlideIn {
+            0% { transform: translateX(45px); opacity: 0.6; }
+            40%, 100% { transform: translateX(0px); opacity: 1; }
+        }
+        .anim-plug-slide {
+            animation: plugSlideIn 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        }
+
+        @keyframes crimpPress {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.78); }
+        }
+        .anim-crimp-press {
+            animation: crimpPress 1.8s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.4)); }
+            50% { filter: drop-shadow(0 0 18px rgba(245, 158, 11, 0.9)); }
+        }
+        .anim-pulse-glow {
+            animation: pulseGlow 2.5s infinite ease-in-out;
+        }
+
+        @keyframes signalFlow {
+            from { stroke-dashoffset: 40; }
+            to { stroke-dashoffset: 0; }
+        }
+        .signal-line {
+            stroke-dasharray: 8 8;
+            animation: signalFlow 0.8s linear infinite;
+        }
+
+        /* Seamless 60fps Scene Crossfades */
+        .sim-scene {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.96) translateY(8px);
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .sim-scene.scene-active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translateY(0px);
+        }
+
+        .scrubber-track {
+            background: rgba(255, 255, 255, 0.15);
+            cursor: pointer;
         }
     </style>
 </head>
@@ -56,7 +139,7 @@
             </div>
             <div>
                 <span class="text-[10px] uppercase font-bold text-amber-400 tracking-wider">INTERACTIVE PIECE #2</span>
-                <h1 class="text-sm sm:text-base font-black text-white leading-tight">Interactive Video: เข้าสายแลน & เครื่องจำลองสี T568B</h1>
+                <h1 class="text-sm sm:text-base font-black text-white leading-tight">Interactive Video: วิดีโอจำลองเข้าสายแลน เสียงบรรยายไทยต่อเนื่อง (Google Thai)</h1>
             </div>
         </div>
 
@@ -65,6 +148,10 @@
                 <span class="text-slate-400">Checkpoint:</span>
                 <span id="video-score-badge" class="font-black text-amber-400 font-mono">0 / 3 ข้อ</span>
             </div>
+            <button onclick="toggleVideoMode()" id="mode-toggle-btn" class="bg-amber-950/80 hover:bg-amber-900 text-amber-300 text-xs font-semibold px-3 py-1.5 rounded-xl border border-amber-500/50 transition-all flex items-center gap-1.5 shadow active:scale-95">
+                <i class="fa-solid fa-clapperboard"></i>
+                <span id="mode-toggle-text">สลับเป็น YouTube</span>
+            </button>
             <a href="interactive.html" target="_top" class="hidden sm:inline-flex items-center gap-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-xl border border-slate-700 transition-all">
                 <i class="fa-solid fa-layer-group text-amber-400"></i>
                 <span>ดูทั้ง 3 ชิ้น</span>
@@ -80,9 +167,234 @@
             <!-- Left: Video Player & Simulator (8 Cols) -->
             <div class="lg:col-span-8 space-y-5">
                 
-                <!-- Video Player with Overlay Checkpoints -->
-                <div class="relative w-full rounded-2xl overflow-hidden border-2 border-amber-500/40 shadow-2xl bg-slate-950">
-                    <div class="relative w-full" style="padding-top: 56.25%;">
+                <!-- VIDEO CONTAINER (Supports Both Built-in Animated Motion Video & YouTube) -->
+                <div class="relative w-full rounded-3xl overflow-hidden border-2 border-amber-500/40 shadow-2xl bg-slate-950">
+                    
+                    <!-- 1. BUILT-IN ANIMATED MOTION VIDEO PLAYER WITH CONTINUOUS GOOGLE THAI VOICE -->
+                    <div id="sim-video-wrapper" class="relative w-full aspect-video bg-gradient-to-br from-slate-950 via-slate-900 to-amber-950/40 flex flex-col justify-between p-4 select-none">
+                        
+                        <!-- Top HUD Info Bar -->
+                        <div class="flex items-center justify-between z-10 text-xs">
+                            <div class="flex items-center gap-2 bg-slate-900/95 border border-amber-500/40 px-3 py-1 rounded-full backdrop-blur-md shadow">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                                <span id="sim-scene-tag" class="font-bold text-amber-300 font-mono text-[11px] sm:text-xs">SCENE 1/4: ปอกฉนวนสาย UTP</span>
+                            </div>
+                            
+                            <!-- Voice & Engine Info Badge -->
+                            <div class="flex items-center gap-2">
+                                <button onclick="toggleVoiceNarration()" id="sim-voice-btn" class="bg-slate-900/95 border border-amber-500/40 px-3 py-1 rounded-full text-amber-300 font-semibold text-[11px] flex items-center gap-1.5 shadow transition-all hover:bg-amber-950 active:scale-95">
+                                    <i id="sim-voice-icon" class="fa-solid fa-volume-high text-amber-400"></i>
+                                    <span id="sim-voice-name-badge">Google ภาษาไทย</span>
+                                </button>
+                                <div class="bg-slate-900/95 border border-slate-700 px-2.5 py-1 rounded-full text-slate-300 font-mono text-[11px] flex items-center gap-1">
+                                    <i class="fa-solid fa-gauge text-amber-400"></i>
+                                    <span id="sim-speed-text">1.0x</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Central 60fps Animated Motion Stage -->
+                        <div id="sim-canvas-stage" class="relative flex-1 flex items-center justify-center overflow-hidden my-2 min-h-[170px] sm:min-h-[220px]">
+                            
+                            <!-- SCENE 1: WIRE STRIPPING -->
+                            <div id="stage-scene-1" class="sim-scene scene-active flex flex-col items-center justify-center text-center space-y-3">
+                                <div class="relative w-72 sm:w-80 h-32 flex items-center justify-center">
+                                    
+                                    <!-- Main Blue UTP Cable Body -->
+                                    <div class="w-48 sm:w-56 h-10 bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500 rounded-l-2xl border-2 border-white/80 shadow-2xl relative flex items-center px-3">
+                                        <div class="flex flex-col text-left">
+                                            <span class="text-[9px] font-mono font-black text-white tracking-widest leading-none">CAT 6A SHIELDED</span>
+                                            <span class="text-[7px] text-cyan-200 font-mono">10GBASE-T 500MHz</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Exposed Stripped Core with 4 Twisted Pairs -->
+                                    <div class="w-16 h-8 bg-slate-900 border-y-2 border-dashed border-amber-400/80 flex flex-col justify-around px-1.5 anim-pulse-glow relative">
+                                        <div class="flex justify-around items-center">
+                                            <span class="w-2.5 h-2 bg-gradient-to-r from-orange-400 to-orange-600 rounded"></span>
+                                            <span class="w-2.5 h-2 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded"></span>
+                                        </div>
+                                        <div class="flex justify-around items-center">
+                                            <span class="w-2.5 h-2 bg-gradient-to-r from-blue-400 to-blue-600 rounded"></span>
+                                            <span class="w-2.5 h-2 bg-gradient-to-r from-amber-600 to-amber-900 rounded"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cut Jacket Piece Sliding Off -->
+                                    <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-sky-400 border-2 border-dashed border-white/60 rounded-r-xl anim-jacket-slide flex items-center justify-center">
+                                        <span class="text-[8px] text-white font-mono font-bold">2.5cm</span>
+                                    </div>
+
+                                    <!-- Rotary Stripper Tool Orbiting & Slicing -->
+                                    <div class="absolute right-14 w-12 h-16 bg-gradient-to-b from-amber-400 to-orange-500 border-2 border-white rounded-2xl shadow-2xl flex flex-col items-center justify-center anim-orbit-cut text-white text-xs font-black">
+                                        <i class="fa-solid fa-scissors text-sm drop-shadow"></i>
+                                        <span class="text-[7px] tracking-tight">STRIP</span>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-900/95 border border-amber-500/40 px-4 py-1 rounded-xl text-xs text-amber-200 shadow-md">
+                                    <i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i> หมุนใบมีด 1 - 2 รอบเพื่อปอกฉนวนนอกระยะ 2.5 ซม. โดยไม่ให้บาดทองแดง
+                                </div>
+                            </div>
+
+                            <!-- SCENE 2: T568B WIRE ORDERING & TRIMMING -->
+                            <div id="stage-scene-2" class="sim-scene flex flex-col items-center justify-center text-center space-y-3">
+                                <div class="relative flex items-end justify-center gap-1.5 sm:gap-2 p-3 bg-slate-950/90 rounded-2xl border border-slate-800 shadow-2xl">
+                                    
+                                    <!-- 8 Color Wires with Accurate T568B Code -->
+                                    <div class="flex flex-col items-center gap-1"><span class="text-[9px] font-mono text-amber-300 font-bold">1</span><div class="w-4 h-20 rounded-t bg-gradient-to-b from-orange-300 via-white to-orange-400 border border-white shadow"></div><span class="text-[8px] text-slate-300">ขาวส้ม</span></div>
+                                    <div class="flex flex-col items-center gap-1"><span class="text-[9px] font-mono text-amber-300 font-bold">2</span><div class="w-4 h-20 rounded-t bg-gradient-to-b from-orange-600 to-orange-500 border border-white shadow"></div><span class="text-[8px] text-slate-300">ส้ม</span></div>
+                                    <div class="flex flex-col items-center gap-1"><span class="text-[9px] font-mono text-amber-300 font-bold">3</span><div class="w-4 h-20 rounded-t bg-gradient-to-b from-emerald-300 via-white to-emerald-400 border border-white shadow"></div><span class="text-[8px] text-slate-300">ขาวเขียว</span></div>
+                                    <div class="flex flex-col items-center gap-1"><span class="text-[9px] font-mono text-amber-300 font-bold">4</span><div class="w-4 h-20 rounded-t bg-gradient-to-b from-blue-600 to-blue-500 border border-white shadow"></div><span class="text-[8px] text-slate-300">น้ำเงิน</span></div>
+                                    <div class="flex flex-col items-center gap-1"><span class="text-[9px] font-mono text-amber-300 font-bold">5</span><div class="w-4 h-20 rounded-t bg-gradient-to-b from-sky-300 via-white to-blue-400 border border-white shadow"></div><span class="text-[8px] text-slate-300">ขาวน้ำเงิน</span></div>
+                                    <div class="flex flex-col items-center gap-1"><span class="text-[9px] font-mono text-amber-300 font-bold">6</span><div class="w-4 h-20 rounded-t bg-gradient-to-b from-emerald-600 to-emerald-500 border border-white shadow"></div><span class="text-[8px] text-slate-300">เขียว</span></div>
+                                    <div class="flex flex-col items-center gap-1"><span class="text-[9px] font-mono text-amber-300 font-bold">7</span><div class="w-4 h-20 rounded-t bg-gradient-to-b from-amber-400 via-white to-amber-700 border border-white shadow"></div><span class="text-[8px] text-slate-300">ขาวน้ำตาล</span></div>
+                                    <div class="flex flex-col items-center gap-1"><span class="text-[9px] font-mono text-amber-300 font-bold">8</span><div class="w-4 h-20 rounded-t bg-gradient-to-b from-amber-900 to-amber-800 border border-white shadow"></div><span class="text-[8px] text-slate-300">น้ำตาล</span></div>
+
+                                    <!-- Scissors Trimming Straight Line -->
+                                    <div class="absolute -top-4 right-1/4 anim-scissor-trim text-cyan-300 text-2xl drop-shadow-[0_0_12px_#00f2fe]">
+                                        <i class="fa-solid fa-scissors rotate-90"></i>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-900/95 border border-amber-500/40 px-4 py-1 rounded-xl text-xs text-amber-200 shadow-md">
+                                    <i class="fa-solid fa-ruler mr-1 text-cyan-400"></i> คลายเกลียว รีดดัดให้ตรงเรียงสี T568B แล้วตัดปลายให้เสมอกัน 1.3 ซม.
+                                </div>
+                            </div>
+
+                            <!-- SCENE 3: RJ45 PLUG INSERTION & MECHANICAL CRIMPING -->
+                            <div id="stage-scene-3" class="sim-scene flex flex-col items-center justify-center text-center space-y-3">
+                                <div class="relative w-80 h-32 flex items-center justify-center">
+                                    
+                                    <!-- 8 Aligned Wires -->
+                                    <div class="w-24 h-10 bg-slate-900 border-y border-amber-400/80 rounded-l flex items-center justify-around px-1.5 shadow-inner">
+                                        <span class="w-1.5 h-6 bg-orange-400 rounded-sm"></span>
+                                        <span class="w-1.5 h-6 bg-orange-600 rounded-sm"></span>
+                                        <span class="w-1.5 h-6 bg-emerald-400 rounded-sm"></span>
+                                        <span class="w-1.5 h-6 bg-blue-600 rounded-sm"></span>
+                                        <span class="w-1.5 h-6 bg-sky-400 rounded-sm"></span>
+                                        <span class="w-1.5 h-6 bg-emerald-600 rounded-sm"></span>
+                                        <span class="w-1.5 h-6 bg-amber-600 rounded-sm"></span>
+                                        <span class="w-1.5 h-6 bg-amber-900 rounded-sm"></span>
+                                    </div>
+
+                                    <!-- Crystal Transparent RJ45 Plug Sliding In -->
+                                    <div class="w-36 h-16 bg-cyan-500/20 border-2 border-cyan-300/80 rounded-r-2xl backdrop-blur-md shadow-2xl flex items-center justify-between px-3 anim-plug-slide anim-pulse-glow">
+                                        <div class="flex flex-col text-left">
+                                            <span class="text-[9px] font-black text-cyan-200">RJ-45 PLUG</span>
+                                            <span class="text-[7px] text-cyan-300/70 font-mono">8P8C MODULAR</span>
+                                        </div>
+                                        
+                                        <!-- 8 Gold Crimp Contact Pins -->
+                                        <div class="flex gap-1">
+                                            <span class="w-1 h-8 bg-amber-300 rounded shadow-[0_0_5px_#fde047]"></span>
+                                            <span class="w-1 h-8 bg-amber-300 rounded shadow-[0_0_5px_#fde047]"></span>
+                                            <span class="w-1 h-8 bg-amber-300 rounded shadow-[0_0_5px_#fde047]"></span>
+                                            <span class="w-1 h-8 bg-amber-300 rounded shadow-[0_0_5px_#fde047]"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Crimper Jaws Clamping Down -->
+                                    <div class="absolute -top-3 right-4 text-rose-400 text-3xl anim-crimp-press drop-shadow-[0_0_12px_#f43f5e]">
+                                        <i class="fa-solid fa-wrench"></i>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-900/95 border border-amber-500/40 px-4 py-1 rounded-xl text-xs text-amber-200 shadow-md">
+                                    <i class="fa-solid fa-screwdriver-wrench text-amber-400 mr-1"></i> สอดสายให้สุดจนเห็นทองแดงชนหน้าสัมผัส แล้วบีบย้ำด้วยคีมให้แน่นสนิท
+                                </div>
+                            </div>
+
+                            <!-- SCENE 4: CABLE TESTER CONTINUOUS MATRIX & SIGNAL FLOW -->
+                            <div id="stage-scene-4" class="sim-scene flex flex-col items-center justify-center text-center space-y-3">
+                                <div class="flex items-center gap-4 sm:gap-8 p-3.5 bg-slate-950/95 rounded-2xl border-2 border-emerald-500/50 shadow-2xl">
+                                    
+                                    <!-- Master Unit -->
+                                    <div class="p-3 bg-slate-900 rounded-xl border border-slate-700 text-center space-y-1.5 shadow">
+                                        <span class="text-[10px] font-bold text-slate-300 font-mono flex items-center justify-center gap-1">
+                                            <i class="fa-solid fa-network-wired text-cyan-400 text-[9px]"></i> MASTER
+                                        </span>
+                                        <div class="grid grid-cols-4 gap-1.5" id="sim-master-leds">
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Animated Signal Flow Cable -->
+                                    <div class="flex flex-col items-center">
+                                        <svg class="w-16 sm:w-20 h-6" viewBox="0 0 80 24" fill="none">
+                                            <line x1="0" y1="12" x2="80" y2="12" stroke="#10b981" stroke-width="3" class="signal-line" />
+                                        </svg>
+                                        <span class="text-[8px] font-mono text-emerald-400 font-bold">10 Gbps OK</span>
+                                    </div>
+
+                                    <!-- Remote Unit -->
+                                    <div class="p-3 bg-slate-900 rounded-xl border border-slate-700 text-center space-y-1.5 shadow">
+                                        <span class="text-[10px] font-bold text-slate-300 font-mono flex items-center justify-center gap-1">
+                                            <i class="fa-solid fa-satellite-dish text-emerald-400 text-[9px]"></i> REMOTE
+                                        </span>
+                                        <div class="grid grid-cols-4 gap-1.5" id="sim-remote-leds">
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                            <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-emerald-950/90 border border-emerald-500/50 px-4 py-1 rounded-xl text-xs text-emerald-300 font-bold shadow-md">
+                                    <i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i> สัญญาณผ่าน 100%! ไฟ LED 1 - 8 ติดตรงกันครบทุกคู่สาย
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Live Thai Subtitle Display Bar -->
+                        <div class="bg-slate-950/95 border border-amber-500/40 rounded-2xl p-2.5 text-center text-xs text-slate-200 font-medium z-10 shadow-lg">
+                            <span id="sim-subtitle-text"><i class="fa-solid fa-closed-captioning text-amber-400 mr-1.5"></i> ยินดีต้อนรับสู่ Interactive Video: ขั้นตอนการเข้าหัวสายแลนมาตรฐาน T568B</span>
+                        </div>
+
+                        <!-- Video Controls & Timeline Bar -->
+                        <div class="pt-2 z-10 space-y-1.5">
+                            
+                            <!-- Timeline Scrubber Bar -->
+                            <div class="relative w-full h-2 rounded-full scrubber-track overflow-hidden" onclick="seekSimVideo(event)" id="sim-timeline-bar">
+                                <div id="sim-progress" class="h-full bg-gradient-to-r from-amber-500 via-orange-400 to-cyan-400 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                            </div>
+
+                            <!-- Control Buttons -->
+                            <div class="flex items-center justify-between text-xs pt-1">
+                                <div class="flex items-center gap-2">
+                                    <button onclick="togglePlaySimVideo()" id="sim-play-btn" class="w-8 h-8 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold flex items-center justify-center shadow transition-all active:scale-95">
+                                        <i id="sim-play-icon" class="fa-solid fa-play"></i>
+                                    </button>
+                                    <button onclick="restartSimVideo()" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center border border-slate-700 transition-all active:scale-95" title="เริ่มใหม่">
+                                        <i class="fa-solid fa-rotate-left"></i>
+                                    </button>
+                                    <span class="font-mono text-slate-400 text-[11px] ml-1">
+                                        <span id="sim-step-indicator">ขั้นตอน 1 / 9</span>
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center gap-1.5">
+                                    <button onclick="cycleSimSpeed()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-[11px] font-mono font-bold transition-all">
+                                        Speed <span id="sim-speed-badge">1.0x</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- 2. YOUTUBE VIDEO PLAYER (Hidden by default, switchable) -->
+                    <div id="yt-video-wrapper" class="relative w-full aspect-video hidden">
                         <iframe 
                             id="interactive-yt-frame"
                             class="absolute top-0 left-0 w-full h-full"
@@ -95,8 +407,8 @@
                         </iframe>
                     </div>
 
-                    <!-- Overlay Checkpoint Modal -->
-                    <div id="video-checkpoint-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md p-4 sm:p-6 flex flex-col justify-center items-center text-center hidden z-30 transition-all">
+                    <!-- Overlay Checkpoint Modal (Appears over active video) -->
+                    <div id="video-checkpoint-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md p-4 sm:p-6 flex flex-col justify-center items-center text-center hidden z-40 transition-all">
                         <div class="max-w-md w-full bg-slate-900 p-5 sm:p-6 rounded-3xl border-2 border-amber-400 shadow-2xl space-y-4">
                             <div class="flex items-center justify-between">
                                 <span id="cp-modal-badge" class="text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40 px-3 py-1 rounded-full uppercase">
@@ -126,25 +438,25 @@
                         <span>แตะเพื่อทดสอบความรู้ตามช่วงเวลา</span>
                     </div>
                     <div class="grid grid-cols-3 gap-2">
-                        <button onclick="triggerCheckpoint(1)" class="p-2 rounded-xl bg-slate-800 hover:bg-amber-600/30 text-slate-300 hover:text-white border border-slate-700 hover:border-amber-500 text-xs font-semibold transition-all text-left flex items-center gap-2">
+                        <button onclick="jumpToNarrationStep(0)" class="p-2 rounded-xl bg-slate-800 hover:bg-amber-600/30 text-slate-300 hover:text-white border border-slate-700 hover:border-amber-500 text-xs font-semibold transition-all text-left flex items-center gap-2">
                             <span class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0">1</span>
                             <div class="truncate">
-                                <span class="block text-[10px] text-slate-400">0:45 นาที</span>
-                                <span class="truncate block">ปอกสาย UTP</span>
+                                <span class="block text-[10px] text-slate-400">จุดที่ 1</span>
+                                <span class="truncate block">1. ปอกสาย UTP</span>
                             </div>
                         </button>
-                        <button onclick="triggerCheckpoint(2)" class="p-2 rounded-xl bg-slate-800 hover:bg-amber-600/30 text-slate-300 hover:text-white border border-slate-700 hover:border-amber-500 text-xs font-semibold transition-all text-left flex items-center gap-2">
+                        <button onclick="jumpToNarrationStep(2)" class="p-2 rounded-xl bg-slate-800 hover:bg-amber-600/30 text-slate-300 hover:text-white border border-slate-700 hover:border-amber-500 text-xs font-semibold transition-all text-left flex items-center gap-2">
                             <span class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0">2</span>
                             <div class="truncate">
-                                <span class="block text-[10px] text-slate-400">1:30 นาที</span>
-                                <span class="truncate block">เรียงสี T568B</span>
+                                <span class="block text-[10px] text-slate-400">จุดที่ 2</span>
+                                <span class="truncate block">2. เรียงสี T568B</span>
                             </div>
                         </button>
-                        <button onclick="triggerCheckpoint(3)" class="p-2 rounded-xl bg-slate-800 hover:bg-amber-600/30 text-slate-300 hover:text-white border border-slate-700 hover:border-amber-500 text-xs font-semibold transition-all text-left flex items-center gap-2">
+                        <button onclick="jumpToNarrationStep(5)" class="p-2 rounded-xl bg-slate-800 hover:bg-amber-600/30 text-slate-300 hover:text-white border border-slate-700 hover:border-amber-500 text-xs font-semibold transition-all text-left flex items-center gap-2">
                             <span class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0">3</span>
                             <div class="truncate">
-                                <span class="block text-[10px] text-slate-400">2:15 นาที</span>
-                                <span class="truncate block">ตรวจ Tester</span>
+                                <span class="block text-[10px] text-slate-400">จุดที่ 3</span>
+                                <span class="truncate block">3. ย้ำ & Tester</span>
                             </div>
                         </button>
                     </div>
@@ -267,6 +579,413 @@
     </div>
 
     <script>
+        let isSimMode = true;
+        function toggleVideoMode() {
+            isSimMode = !isSimMode;
+            const simWrap = document.getElementById('sim-video-wrapper');
+            const ytWrap = document.getElementById('yt-video-wrapper');
+            const toggleText = document.getElementById('mode-toggle-text');
+
+            if (isSimMode) {
+                simWrap.classList.remove('hidden');
+                ytWrap.classList.add('hidden');
+                toggleText.innerText = 'สลับเป็น YouTube';
+                showToast('สลับเป็นโหมด Animated Motion Simulation Video');
+            } else {
+                pauseSimVideo();
+                simWrap.classList.add('hidden');
+                ytWrap.classList.remove('hidden');
+                toggleText.innerText = 'สลับเป็น Motion Video';
+                showToast('สลับเป็นวิดีโอสอนจริงจาก YouTube');
+            }
+        }
+
+        // ========================================================
+        // GOOGLE TRANSLATE TTS AUDIO ENGINE (HIGH QUALITY THAI)
+        // Uses the same voice as Google Translate speaker button
+        // ========================================================
+        let voiceNarrationEnabled = true;
+        let currentTTSAudio = null;
+        let ttsAudioQueue = [];
+        let isPlayingTTSQueue = false;
+
+        // Split Thai text into chunks that fit Google TTS URL limit (~180 chars safe)
+        function splitThaiText(text, maxLen) {
+            if (text.length <= maxLen) return [text];
+            const chunks = [];
+            let remaining = text;
+            while (remaining.length > 0) {
+                if (remaining.length <= maxLen) {
+                    chunks.push(remaining);
+                    break;
+                }
+                // Find a natural break point (space, ครับ, ค่ะ, or comma-like)
+                let splitPos = -1;
+                for (let i = Math.min(remaining.length - 1, maxLen); i > maxLen * 0.4; i--) {
+                    const ch = remaining[i];
+                    if (ch === ' ' || ch === ',' || ch === '。') {
+                        splitPos = i;
+                        break;
+                    }
+                }
+                if (splitPos <= 0) splitPos = maxLen;
+                chunks.push(remaining.substring(0, splitPos).trim());
+                remaining = remaining.substring(splitPos).trim();
+            }
+            return chunks.filter(c => c.length > 0);
+        }
+
+        function buildGoogleTTSUrl(text) {
+            const encoded = encodeURIComponent(text);
+            return 'https://translate.google.com/translate_tts?ie=UTF-8&tl=th&client=gtx&q=' + encoded;
+        }
+
+        function stopAllTTSAudio() {
+            isPlayingTTSQueue = false;
+            ttsAudioQueue = [];
+            if (currentTTSAudio) {
+                currentTTSAudio.pause();
+                currentTTSAudio.removeAttribute('src');
+                currentTTSAudio.load();
+                currentTTSAudio = null;
+            }
+            // Also stop Web Speech API fallback
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        // Fallback: use Web Speech API if Google TTS is blocked
+        function fallbackWebSpeech(text, onDone) {
+            if (!('speechSynthesis' in window)) {
+                if (onDone) onDone();
+                return;
+            }
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'th-TH';
+            utter.rate = 0.85;
+            utter.pitch = 1.0;
+            // Find best Thai voice
+            const voices = window.speechSynthesis.getVoices();
+            const thaiVoice = voices.find(v => v.lang.startsWith('th') || v.lang.includes('TH'));
+            if (thaiVoice) utter.voice = thaiVoice;
+            window.__activeSpeechUtterance = utter;
+            utter.onend = () => { if (onDone) onDone(); };
+            utter.onerror = () => { if (onDone) onDone(); };
+            window.speechSynthesis.speak(utter);
+        }
+
+        // Play a single text with Google TTS, calls onDone when finished
+        function playGoogleTTS(text, playbackRate, onDone) {
+            stopAllTTSAudio();
+            const chunks = splitThaiText(text, 180);
+            ttsAudioQueue = chunks.slice();
+            isPlayingTTSQueue = true;
+            let useFallback = false;
+
+            function playNextChunk() {
+                if (!isPlayingTTSQueue || ttsAudioQueue.length === 0) {
+                    isPlayingTTSQueue = false;
+                    if (onDone) onDone();
+                    return;
+                }
+
+                // If Google TTS failed before, use Web Speech API for remaining
+                if (useFallback) {
+                    const remainingText = ttsAudioQueue.join(' ');
+                    ttsAudioQueue = [];
+                    isPlayingTTSQueue = false;
+                    fallbackWebSpeech(remainingText, onDone);
+                    return;
+                }
+
+                const chunk = ttsAudioQueue.shift();
+                const audio = new Audio();
+                currentTTSAudio = audio;
+
+                audio.oncanplaythrough = () => {
+                    audio.playbackRate = Math.max(0.5, Math.min(2.0, playbackRate));
+                };
+
+                audio.onended = () => {
+                    currentTTSAudio = null;
+                    setTimeout(playNextChunk, 100);
+                };
+
+                audio.onerror = () => {
+                    console.warn('Google TTS failed, falling back to Web Speech API');
+                    currentTTSAudio = null;
+                    useFallback = true;
+                    // Fallback for this chunk + remaining
+                    const allRemaining = chunk + ' ' + ttsAudioQueue.join(' ');
+                    ttsAudioQueue = [];
+                    isPlayingTTSQueue = false;
+                    fallbackWebSpeech(allRemaining.trim(), onDone);
+                };
+
+                audio.src = buildGoogleTTSUrl(chunk);
+                audio.play().catch(() => {
+                    console.warn('Google TTS play() rejected, falling back');
+                    currentTTSAudio = null;
+                    useFallback = true;
+                    const allRemaining = chunk + ' ' + ttsAudioQueue.join(' ');
+                    ttsAudioQueue = [];
+                    isPlayingTTSQueue = false;
+                    fallbackWebSpeech(allRemaining.trim(), onDone);
+                });
+            }
+
+            playNextChunk();
+        }
+
+        // Update voice badge
+        (function() {
+            const badge = document.getElementById('sim-voice-name-badge');
+            if (badge) badge.innerText = 'Google Translate TTS';
+        })();
+
+        function toggleVoiceNarration() {
+            voiceNarrationEnabled = !voiceNarrationEnabled;
+            const icon = document.getElementById('sim-voice-icon');
+            const btn = document.getElementById('sim-voice-btn');
+            if (voiceNarrationEnabled) {
+                icon.className = 'fa-solid fa-volume-high text-amber-400';
+                btn.classList.remove('opacity-50');
+                showToast('เปิดเสียงพูดบรรยายไทย (Google Translate TTS)');
+                if (simPlaying) playCurrentStepNarration();
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-slate-500';
+                btn.classList.add('opacity-50');
+                stopAllTTSAudio();
+                showToast('ปิดเสียงพูดบรรยาย');
+            }
+        }
+
+        // ========================================================
+        // SEAMLESS CONTINUOUS NARRATION STEPS (NO DEAD SILENCE)
+        // ========================================================
+        const narrationSteps = [
+            // STEP 0 (SCENE 1)
+            {
+                scene: 1,
+                subtitle: "🎬 ขั้นตอนที่ 1: การใช้คีมปอกฉนวนภายนอกของสาย UTP Cat 6A ระยะ 2.5 - 3.0 ซม.",
+                speech: "ยินดีต้อนรับสู่การเข้าหัวสายแลนครับ ขั้นตอนแรกเราจะใช้คีมปอกฉนวนภายนอกของสายยูทีพีแคทหกเอ โดยวัดระยะประมาณสองจุดห้าถึงสามเซนติเมตรครับ",
+                checkpoint: null
+            },
+            // STEP 1 (SCENE 1)
+            {
+                scene: 1,
+                subtitle: "💡 หมุนใบมีด 1 - 2 รอบเบาๆ เพื่อตัดเฉพาะเปลือกนอก ระวังไม่ให้บาดโดนทองแดงด้านใน",
+                speech: "ให้หมุนใบมีดรอบสายหนึ่งถึงสองรอบอย่างเบามือ เพื่อตัดเฉพาะเปลือกนอกและระวังอย่ากดลึกเกินไปจนบาดโดนทองแดงด้านในครับ",
+                checkpoint: 1 // Quiz Checkpoint 1
+            },
+            // STEP 2 (SCENE 2)
+            {
+                scene: 2,
+                subtitle: "🌈 ขั้นตอนที่ 2: คลายเกลียวคู่สาย แยกเป็น 8 เส้นเดี่ยว แล้วรีดดัดสายให้ตรง",
+                speech: "ขั้นตอนที่สองให้คลายเกลียวคู่สายทั้งสี่คู่ออกเป็นแปดเส้นเดี่ยว จากนั้นใช้นิ้วรีดดัดเส้นลวดทองแดงให้ตรงเรียงขนานกันครับ",
+                checkpoint: null
+            },
+            // STEP 3 (SCENE 2)
+            {
+                scene: 2,
+                subtitle: "📐 จัดเรียงลำดับสี T568B: ขาวส้ม-ส้ม, ขาวเขียว-น้ำเงิน, ขาวน้ำเงิน-เขียว, ขาวน้ำตาล-น้ำตาล",
+                speech: "ต่อไปจัดเรียงลำดับสีตามมาตรฐานทีห้าหกแปดบีได้แก่ขาวส้มส้มขาวเขียวน้ำเงินขาวน้ำเงินเขียวขาวน้ำตาลและน้ำตาลครับ",
+                checkpoint: null
+            },
+            // STEP 4 (SCENE 2)
+            {
+                scene: 2,
+                subtitle: "✂️ รวบสายให้ชิดแล้วใช้กรรไกรตัดปลายสายให้ตรงเสมอกัน เหลือความยาวประมาณ 1.3 ซม.",
+                speech: "เมื่อเรียงสีถูกต้องแล้วให้รวบสายให้ชิดและใช้กรรไกรตัดปลายให้ตรงเสมอกัน เหลือความยาวประมาณหนึ่งจุดสามเซนติเมตรครับ",
+                checkpoint: 2 // Quiz Checkpoint 2
+            },
+            // STEP 5 (SCENE 3)
+            {
+                scene: 3,
+                subtitle: "🔌 ขั้นตอนที่ 3: สอดสายเข้าหัว RJ-45 Modular Plug ให้ปลายสายชนแนบสนิทด้านหน้า",
+                speech: "ขั้นตอนที่สามสอดสายทั้งแปดเส้นเข้าหัวอาร์เจสี่สิบห้าโมดูลาร์ปลั๊ก ให้ปลายสายทองแดงวิ่งเข้าไปชนแนบสนิทกับหน้าสัมผัสด้านหน้าสุดครับ",
+                checkpoint: null
+            },
+            // STEP 6 (SCENE 3)
+            {
+                scene: 3,
+                subtitle: "🔧 นำเข้าช่องย้ำของคีม Modular Crimping Tool แล้วบีบด้ามให้แน่นจนสุดกริ๊ก",
+                speech: "จากนั้นนำหัวเข้าช่องย้ำของคีมย้ำสายแล้วบีบด้ามคีมให้แน่นจนสุด เพื่อให้ฟันทองสัมฤทธิ์จิ้มทะลุฉนวนล็อคสายอย่างมั่นคงครับ",
+                checkpoint: 3 // Quiz Checkpoint 3
+            },
+            // STEP 7 (SCENE 4)
+            {
+                scene: 4,
+                subtitle: "⚡ ขั้นตอนที่ 4: เสียบสายทั้ง 2 ด้านเข้าเครื่อง Cable Tester เพื่อทดสอบสัญญาณ",
+                speech: "ขั้นตอนที่สี่นำสายที่เข้าหัวเสร็จทั้งสองด้านเสียบเข้าเครื่องเคเบิลเทสเตอร์เพื่อเปิดทดสอบสัญญาณการเชื่อมต่อครับ",
+                checkpoint: null
+            },
+            // STEP 8 (SCENE 4)
+            {
+                scene: 4,
+                subtitle: "🎉 สัญญาณสมบูรณ์ 100%! ไฟ LED 1 ถึง 8 สว่างติดเรียงตามลำดับพร้อมกันทั้งสองฝั่ง",
+                speech: "สังเกตสัญญาณไฟแอลอีดีหมายเลขหนึ่งถึงแปดจะสว่างติดเรียงตรงกันอย่างต่อเนื่องทั้งสองฝั่ง แสดงว่าการเข้าสายแลนถูกต้องสมบูรณ์แบบร้อยเปอร์เซ็นต์ครับ",
+                checkpoint: null,
+                isEnd: true
+            }
+        ];
+
+        let currentStepIndex = 0;
+        let simPlaying = false;
+        let simSpeed = 1.0;
+        let nextStepTimeout = null;
+
+        function togglePlaySimVideo() {
+            if (simPlaying) {
+                pauseSimVideo();
+            } else {
+                playSimVideo();
+            }
+        }
+
+        function playSimVideo() {
+            simPlaying = true;
+            document.getElementById('sim-play-icon').className = 'fa-solid fa-pause';
+            playCurrentStepNarration();
+        }
+
+        function pauseSimVideo() {
+            simPlaying = false;
+            document.getElementById('sim-play-icon').className = 'fa-solid fa-play';
+            clearTimeout(nextStepTimeout);
+            stopAllTTSAudio();
+        }
+
+        function restartSimVideo() {
+            currentStepIndex = 0;
+            updateStepVisuals(currentStepIndex);
+            playSimVideo();
+        }
+
+        function cycleSimSpeed() {
+            if (simSpeed === 1.0) simSpeed = 1.5;
+            else if (simSpeed === 1.5) simSpeed = 2.0;
+            else simSpeed = 1.0;
+
+            document.getElementById('sim-speed-text').innerText = simSpeed.toFixed(1) + 'x';
+            document.getElementById('sim-speed-badge').innerText = simSpeed.toFixed(1) + 'x';
+            if (simPlaying) {
+                playCurrentStepNarration();
+            }
+        }
+
+        function seekSimVideo(event) {
+            const bar = document.getElementById('sim-timeline-bar');
+            const rect = bar.getBoundingClientRect();
+            const pos = (event.clientX - rect.left) / rect.width;
+            const targetStep = Math.min(narrationSteps.length - 1, Math.max(0, Math.floor(pos * narrationSteps.length)));
+            jumpToNarrationStep(targetStep);
+        }
+
+        function jumpToNarrationStep(stepIdx) {
+            currentStepIndex = stepIdx;
+            updateStepVisuals(currentStepIndex);
+            if (simPlaying) {
+                playCurrentStepNarration();
+            } else {
+                playSimVideo();
+            }
+        }
+
+        function updateStepVisuals(stepIdx) {
+            const step = narrationSteps[stepIdx];
+            if (!step) return;
+
+            // Update Progress Bar
+            const pct = ((stepIdx + 1) / narrationSteps.length) * 100;
+            document.getElementById('sim-progress').style.width = pct + '%';
+            document.getElementById('sim-step-indicator').innerText = 'ขั้นตอน ' + (stepIdx + 1) + ' / ' + narrationSteps.length;
+
+            // Update Active Scene with 60fps Smooth Crossfade
+            for (let i = 1; i <= 4; i++) {
+                const s = document.getElementById('stage-scene-' + i);
+                if (s) {
+                    if (i === step.scene) s.classList.add('scene-active');
+                    else s.classList.remove('scene-active');
+                }
+            }
+
+            const sceneNames = {
+                1: "SCENE 1/4: ปอกฉนวนสาย UTP",
+                2: "SCENE 2/4: คลายเกลียว & เรียงสี T568B",
+                3: "SCENE 3/4: สอดหัว RJ-45 & ย้ำคีม",
+                4: "SCENE 4/4: ทดสอบ Cable Tester"
+            };
+            document.getElementById('sim-scene-tag').innerText = sceneNames[step.scene];
+            document.getElementById('sim-subtitle-text').innerHTML = '<i class="fa-solid fa-closed-captioning text-amber-400 mr-1.5"></i> ' + step.subtitle;
+        }
+
+        function playCurrentStepNarration() {
+            clearTimeout(nextStepTimeout);
+            stopAllTTSAudio();
+            const step = narrationSteps[currentStepIndex];
+            if (!step) return;
+
+            updateStepVisuals(currentStepIndex);
+
+            if (!voiceNarrationEnabled) {
+                // If voice muted, proceed with generous duration estimate
+                const charCount = step.speech.length;
+                const durationMs = Math.max(5000, (charCount * 150) / simSpeed);
+                nextStepTimeout = setTimeout(() => {
+                    handleStepCompletion(step);
+                }, durationMs);
+                return;
+            }
+
+            // Use Google Translate TTS
+            playGoogleTTS(step.speech, simSpeed, () => {
+                if (!simPlaying) return;
+                // Natural 800ms breathing pause between steps
+                nextStepTimeout = setTimeout(() => {
+                    handleStepCompletion(step);
+                }, 800 / simSpeed);
+            });
+        }
+
+        function handleStepCompletion(step) {
+            if (step.checkpoint) {
+                pauseSimVideo();
+                triggerCheckpoint(step.checkpoint);
+                return;
+            }
+
+            if (step.isEnd) {
+                pauseSimVideo();
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 140, spread: 85, origin: { y: 0.6 } });
+                }
+                showToast('🎉 รับชมวิดีโอจำลองเสร็จสมบูรณ์เรียบร้อย!');
+                return;
+            }
+
+            // Move to next step seamlessly
+            currentStepIndex++;
+            if (currentStepIndex < narrationSteps.length) {
+                playCurrentStepNarration();
+            } else {
+                pauseSimVideo();
+            }
+        }
+
+        function resumeVideoAfterCheckpoint() {
+            document.getElementById('video-checkpoint-modal').classList.add('hidden');
+            showToast("รับชมวิดีโอต่อได้เลยครับ!");
+            if (isSimMode) {
+                currentStepIndex++;
+                if (currentStepIndex < narrationSteps.length) {
+                    playSimVideo();
+                }
+            }
+        }
+
         let soundEnabled = true;
         function playChimeSound(isCorrect) {
             if (!soundEnabled) return;
@@ -309,7 +1028,7 @@
 
         const checkpointData = {
             1: {
-                timeStr: "0:45",
+                timeStr: "จุดที่ 1",
                 badge: "Checkpoint 1: การปอกฉนวนสาย",
                 question: "1. ในขั้นตอนแรกของการเข้าหัวสายแลน ควรปอกเปลือกนอกของสาย UTP ลึกประมาณเท่าใด?",
                 options: [
@@ -321,7 +1040,7 @@
                 explanation: "ถูกต้อง! การปอกเปลือกนอกประมาณ 2.5 - 3.0 ซม. ช่วยให้มีระยะเพียงพอในการคลายเกลียวและรีดดัดสายให้ตรงเรียงสีก่อนตัดปลายเสมอ"
             },
             2: {
-                timeStr: "1:30",
+                timeStr: "จุดที่ 2",
                 badge: "Checkpoint 2: การเรียงสีมาตรฐาน T568B",
                 question: "2. มาตรฐานการเรียงสีสายแลนแบบ TIA/EIA-568B สองเส้นแรก (Pin 1 และ Pin 2) คือสีอะไร?",
                 options: [
@@ -333,7 +1052,7 @@
                 explanation: "ถูกต้อง! มาตรฐาน T568B เริ่มต้นด้วย พิน 1: ขาวส้ม และ พิน 2: ส้ม (ทำหน้าที่คู่สายส่งสัญญาณ Transmit: Tx)"
             },
             3: {
-                timeStr: "2:15",
+                timeStr: "จุดที่ 3",
                 badge: "Checkpoint 3: การตรวจเช็คด้วย Cable Tester",
                 question: "3. เมื่อนำสายตรง (Straight-Through) ทั้ง 2 ด้านมาทดสอบด้วยเครื่อง Cable Tester ไฟ LED ควรวิ่งอย่างไร?",
                 options: [
@@ -397,21 +1116,23 @@
                     document.getElementById('check-icon-' + cpId).className = "fa-solid fa-circle-check text-emerald-400 mt-0.5";
                 }
                 playChimeSound(true);
+                speakSingleLine("ยอดเยี่ยมมากครับ คำตอบถูกต้อง");
             } else {
                 btnElem.classList.add('bg-rose-950', 'border-rose-500', 'text-rose-300');
                 btnElem.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-400";
                 feedback.className = "p-3 rounded-xl text-xs text-left bg-rose-950/90 border border-rose-500 text-rose-200";
                 feedback.innerHTML = '<strong class="text-white block mb-1">❌ ยังไม่ถูกต้อง</strong> ' + explanation;
                 playChimeSound(false);
+                speakSingleLine("ยังไม่ถูกต้องครับ ลองศึกษาทบทวนดูนะครับ");
             }
 
             feedback.classList.remove('hidden');
             contBtn.classList.remove('hidden');
         }
 
-        function resumeVideoAfterCheckpoint() {
-            document.getElementById('video-checkpoint-modal').classList.add('hidden');
-            showToast("รับชมวิดีโอต่อได้เลยครับ!");
+        function speakSingleLine(text) {
+            if (!voiceNarrationEnabled) return;
+            playGoogleTTS(text, 1.0, null);
         }
 
         const standardColorsT568B = [
@@ -510,9 +1231,11 @@
                             confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
                         }
                         showToast('🎉 ถูกต้อง 100%! สายแลน T568B ไฟวิ่งติดครบ 8 พินสมบูรณ์');
+                        speakSingleLine("ยินดีด้วยครับ คุณเรียงสายแลนมาตรฐาน ทีห้าหกแปดบี ได้ถูกต้องครบทั้งแปดพินสมบูรณ์แบบครับ");
                     } else {
                         showToast('❌ มีพินที่สลับสีผิด กรุณากดรีเซ็ตแล้วเรียงใหม่ตามคู่มือ');
                         playChimeSound(false);
+                        speakSingleLine("มีบางพินที่สลับสีผิดครับ กรุณากดรีเซ็ตแล้วลองเรียงใหม่อีกครั้งนะครับ");
                     }
                     return;
                 }
@@ -566,6 +1289,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initWireSimulator();
+            updateStepVisuals(0);
         });
     </script>
 </body>
