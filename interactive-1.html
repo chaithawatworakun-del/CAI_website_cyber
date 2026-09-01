@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ชิ้นที่ 1: Interactive Image สำรวจอุปกรณ์เครือข่าย | NiceKung</title>
+    <link rel="icon" type="image/png" href="image/logo.png">
+    
+    <!-- Google Fonts: Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons 6.5.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Kanit', 'sans-serif'] },
+                    colors: {
+                        cyber: { cyan: '#00f2fe', blue: '#4facfe', neon: '#00e5ff', dark: '#0a1128' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #0b1329;
+            color: #f1f5f9;
+        }
+
+        .bg-grid-cyber {
+            background-image: 
+                radial-gradient(rgba(14, 165, 233, 0.15) 1px, transparent 1px),
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 28px 28px, 56px 56px, 56px 56px;
+        }
+
+        @keyframes dashFlow {
+            from { stroke-dashoffset: 40; }
+            to { stroke-dashoffset: 0; }
+        }
+        .flow-line {
+            stroke-dasharray: 6 6;
+            animation: dashFlow 1.2s linear infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 0.15; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        .animate-ring {
+            animation: pulse-ring 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .hotspot-item {
+            position: absolute;
+            z-index: 25;
+            transition: transform 0.25s ease;
+        }
+        .hotspot-item:hover, .hotspot-item:focus-within, .hotspot-item.active-hold {
+            z-index: 70;
+        }
+
+        .hotspot-node {
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .hotspot-item:hover .hotspot-node, .hotspot-item.active-hold .hotspot-node {
+            transform: scale(1.18);
+            filter: drop-shadow(0 0 16px rgba(0, 242, 254, 0.8));
+        }
+
+        .cyber-tooltip {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(12px) scale(0.92);
+            transition: opacity 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        visibility 0.28s;
+        }
+
+        .hotspot-item:hover .cyber-tooltip,
+        .hotspot-item:focus-within .cyber-tooltip,
+        .hotspot-item.active-hold .cyber-tooltip {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0px) scale(1);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased min-h-screen p-3 sm:p-6 bg-grid-cyber flex flex-col justify-between">
+
+    <!-- Standalone Mini Header Bar -->
+    <div class="max-w-6xl w-full mx-auto mb-4 flex items-center justify-between bg-slate-900/90 border border-cyan-500/30 rounded-2xl p-3 sm:p-4 backdrop-blur-md shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg border border-cyan-400/40">
+                <i class="fa-solid fa-image"></i>
+            </div>
+            <div>
+                <span class="text-[10px] uppercase font-bold text-cyan-400 tracking-wider">INTERACTIVE PIECE #1</span>
+                <h1 class="text-sm sm:text-base font-black text-white leading-tight">Interactive Image: ผ่าอุปกรณ์เครือข่าย & Topology</h1>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button onclick="toggleSound()" id="sound-btn" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs border border-slate-700 transition-all" title="เปิด/ปิดเสียง">
+                <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+            </button>
+            <a href="interactive.html" target="_top" class="hidden sm:inline-flex items-center gap-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-xl border border-slate-700 transition-all">
+                <i class="fa-solid fa-layer-group text-cyan-400"></i>
+                <span>ดูทั้ง 3 ชิ้น</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Interactive Topology Section -->
+    <div class="max-w-6xl w-full mx-auto bg-slate-900/90 border border-cyan-500/40 rounded-3xl p-4 sm:p-6 shadow-2xl backdrop-blur-xl space-y-4">
+        
+        <!-- Controls & Instruction Bar -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-800 text-xs">
+            <div class="flex items-center gap-2 text-slate-300">
+                <i class="fa-solid fa-hand-pointer text-cyan-400 animate-bounce"></i>
+                <span>นำเมาส์ไป <strong class="text-cyan-300">ชี้ (Hover)</strong> หรือ <strong class="text-cyan-300">แตะค้าง (Hold)</strong> ที่อุปกรณ์ 1 - 6 เพื่อดูสเปกและระดับชั้น OSI</span>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="flex flex-wrap items-center gap-1.5">
+                <button onclick="filterHotspots('all', this)" class="hotspot-filter-btn px-3 py-1 rounded-xl bg-cyan-600 text-white font-semibold shadow">ทั้งหมด (6)</button>
+                <button onclick="filterHotspots('routing', this)" class="hotspot-filter-btn px-3 py-1 rounded-xl bg-slate-800 text-slate-300 hover:text-white">Routing & Switch</button>
+                <button onclick="filterHotspots('security', this)" class="hotspot-filter-btn px-3 py-1 rounded-xl bg-slate-800 text-slate-300 hover:text-white">Security</button>
+                <button onclick="filterHotspots('cabling', this)" class="hotspot-filter-btn px-3 py-1 rounded-xl bg-slate-800 text-slate-300 hover:text-white">Cabling & Wi-Fi</button>
+            </div>
+        </div>
+
+        <!-- Full-Width Topology Arena -->
+        <div class="relative w-full rounded-3xl border-2 border-cyan-500/40 shadow-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 select-none min-h-[560px] sm:min-h-[620px] flex items-center justify-center p-4 sm:p-8 overflow-visible z-10">
+            
+            <!-- Dynamic Animated SVG Cable Grid with Flowing Packets -->
+            <svg class="w-full h-full absolute inset-0 opacity-60 pointer-events-none rounded-3xl overflow-hidden" viewBox="0 0 1000 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="500" cy="300" r="260" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="6 6" class="opacity-40" />
+                <circle cx="500" cy="300" r="160" stroke="#06b6d4" stroke-width="1.5" class="opacity-50" />
+                <circle cx="500" cy="300" r="70" stroke="#38bdf8" stroke-width="2" class="opacity-70" />
+
+                <line x1="200" y1="130" x2="500" y2="300" stroke="#00f2fe" stroke-width="2" class="flow-line" />
+                <line x1="800" y1="130" x2="500" y2="300" stroke="#f43f5e" stroke-width="2" class="flow-line" />
+                <line x1="130" y1="300" x2="500" y2="300" stroke="#3b82f6" stroke-width="2.5" class="flow-line" />
+                <line x1="870" y1="300" x2="500" y2="300" stroke="#a855f7" stroke-width="2.5" class="flow-line" />
+                <line x1="200" y1="470" x2="500" y2="300" stroke="#f59e0b" stroke-width="2" class="flow-line" />
+                <line x1="800" y1="470" x2="500" y2="300" stroke="#10b981" stroke-width="2" class="flow-line" />
+            </svg>
+
+            <!-- Center Network Core Node -->
+            <div class="relative z-10 text-center space-y-2 max-w-xs sm:max-w-sm p-5 sm:p-6 rounded-3xl bg-slate-900/90 border-2 border-cyan-400/50 shadow-2xl backdrop-blur-md">
+                <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-500 via-sky-400 to-blue-600 flex items-center justify-center text-white text-2xl shadow-xl shadow-cyan-500/50">
+                    <i class="fa-solid fa-server animate-pulse"></i>
+                </div>
+                <h4 class="text-sm sm:text-base font-black text-white tracking-wide">ENTERPRISE TOPOLOGY LAB</h4>
+                <p class="text-xs text-slate-300">นำเมาส์ไปชี้หรือแตะค้างที่จุดอุปกรณ์รอบๆ ผัง</p>
+                <button onclick="startAutoTour()" class="mt-2 text-xs bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-1.5 px-4 rounded-full transition-all inline-flex items-center gap-1.5 shadow-md active:scale-95">
+                    <i class="fa-solid fa-play text-[10px]"></i>
+                    <span>เล่นทัวร์ชมทีละจุดอัตโนมัติ</span>
+                </button>
+            </div>
+
+            <!-- Hotspot 1: Router -->
+            <div class="hotspot-item category-routing top-[6%] left-[4%] sm:top-[8%] sm:left-[8%] z-30" id="hotspot-wrap-1" onmouseenter="playChimeSound(true)">
+                <div class="hotspot-node group relative flex flex-col items-center">
+                    <span class="animate-ring absolute inset-0 rounded-full bg-cyan-400"></span>
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-cyan-600 to-sky-400 border-2 border-white text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-xl shadow-cyan-500/60">
+                        <i class="fa-solid fa-route"></i>
+                    </div>
+                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-cyan-300 border border-cyan-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">1. Core Router</span>
+                </div>
+                <div class="cyber-tooltip absolute top-full left-0 sm:left-2 mt-3 w-80 sm:w-96 bg-slate-900/98 border-2 border-cyan-400 rounded-3xl p-5 text-sm space-y-3 backdrop-blur-2xl z-[80] shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
+                    <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+                        <span class="font-bold text-cyan-300 text-xs sm:text-sm bg-cyan-950 px-3 py-1 rounded-lg border border-cyan-500/50 uppercase flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-cyan-400"></i> Layer 3: Network</span>
+                        <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> ONLINE</span>
+                    </div>
+                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">1. Core Gateway Router</h5>
+                    <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 text-xs sm:text-sm">
+                        <div class="flex justify-between text-slate-300"><span>ฮาร์ดแวร์สเปก:</span> <strong class="text-white font-mono font-semibold">Dual 10G SFP+ / 8GB RAM</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>โพรโทคอลที่ใช้:</span> <strong class="text-cyan-300 font-mono font-semibold">BGP, OSPF, IPv4/IPv6, NAT</strong></div>
+                    </div>
+                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">เชื่อมต่อเครือข่ายภายใน LAN ออกสู่อินเทอร์เน็ต WAN โดยอ่าน Logical IP Address บน Routing Table เพื่อเลือกเส้นทางส่งข้อมูลที่เร็วที่สุด</p>
+                    <div class="p-3 bg-cyan-950/70 rounded-xl border border-cyan-500/40 text-xs sm:text-sm text-cyan-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>ประเด็นสำคัญ:</strong> Router ทำงานที่ Layer 3 ใช้ Logical IP Address ในการส่ง Packet</div>
+                </div>
+            </div>
+
+            <!-- Hotspot 2: Firewall -->
+            <div class="hotspot-item category-security top-[6%] right-[4%] sm:top-[8%] sm:right-[8%] z-30" id="hotspot-wrap-2" onmouseenter="playChimeSound(true)">
+                <div class="hotspot-node group relative flex flex-col items-center">
+                    <span class="animate-ring absolute inset-0 rounded-full bg-rose-400"></span>
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-rose-600 to-pink-500 border-2 border-white text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-xl shadow-rose-500/60">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-rose-300 border border-rose-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">2. Firewall NGFW</span>
+                </div>
+                <div class="cyber-tooltip absolute top-full right-0 sm:right-2 mt-3 w-80 sm:w-96 bg-slate-900/98 border-2 border-rose-400 rounded-3xl p-5 text-sm space-y-3 backdrop-blur-2xl z-[80] shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
+                    <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+                        <span class="font-bold text-rose-300 text-xs sm:text-sm bg-rose-950 px-3 py-1 rounded-lg border border-rose-500/50 uppercase flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-rose-400"></i> Layer 4 - 7: Security</span>
+                        <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> ACTIVE IPS</span>
+                    </div>
+                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">2. Next-Gen Hardware Firewall</h5>
+                    <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 text-xs sm:text-sm">
+                        <div class="flex justify-between text-slate-300"><span>ความเร็วการกรอง:</span> <strong class="text-white font-mono font-semibold">10 Gbps / Zero-Day IPS</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>เทคโนโลยี:</span> <strong class="text-rose-300 font-mono font-semibold">Deep Packet, SSL, VPN</strong></div>
+                    </div>
+                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">ปราการด่านแรกป้องกันภัยคุกคาม กรองทราฟฟิก ดักจับมัลแวร์ ป้องกันการโจมตี DDoS และตรวจจับการแฮกเจาะระบบแบบ Real-time</p>
+                    <div class="p-3 bg-rose-950/70 rounded-xl border border-rose-500/40 text-xs sm:text-sm text-rose-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>จุดเด่น:</strong> NGFW สามารถตรวจจับไวรัสที่ซ่อนลึกถึงระดับ Layer 7 (Application)</div>
+                </div>
+            </div>
+
+            <!-- Hotspot 3: L3 Switch -->
+            <div class="hotspot-item category-routing top-[44%] left-[2%] sm:top-[44%] sm:left-[4%] z-30" id="hotspot-wrap-3" onmouseenter="playChimeSound(true)">
+                <div class="hotspot-node group relative flex flex-col items-center">
+                    <span class="animate-ring absolute inset-0 rounded-full bg-blue-400"></span>
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 border-2 border-white text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-xl shadow-blue-500/60">
+                        <i class="fa-solid fa-network-wired"></i>
+                    </div>
+                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-blue-300 border border-blue-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">3. L3 Switch</span>
+                </div>
+                <div class="cyber-tooltip absolute top-[-30px] left-full ml-4 w-80 sm:w-96 bg-slate-900/98 border-2 border-blue-400 rounded-3xl p-5 text-sm space-y-3 backdrop-blur-2xl z-[80] shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
+                    <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+                        <span class="font-bold text-blue-300 text-xs sm:text-sm bg-blue-950 px-3 py-1 rounded-lg border border-blue-500/50 uppercase flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-blue-400"></i> Layer 2 - 3: Switch</span>
+                        <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> 48 PORTS UP</span>
+                    </div>
+                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">3. Layer 3 Managed Core Switch</h5>
+                    <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 text-xs sm:text-sm">
+                        <div class="flex justify-between text-slate-300"><span>พอร์ตเชื่อมต่อ:</span> <strong class="text-white font-mono font-semibold">48x 1G PoE+ & 4x 10G SFP+</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>ฟีเจอร์เด่น:</span> <strong class="text-blue-300 font-mono font-semibold">VLAN 802.1Q, LACP, STP</strong></div>
+                    </div>
+                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">สวิตช์จัดการโครงข่ายหลัก รองรับการแบ่ง VLAN แยกแผนกงานเพื่อความปลอดภัย และส่งเฟรมข้อมูลด้วยตาราง MAC Address Table ตรงสู่พอร์ตปลายทาง</p>
+                    <div class="p-3 bg-blue-950/70 rounded-xl border border-blue-500/40 text-xs sm:text-sm text-blue-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>ข้อดี:</strong> ลดปัญหา Broadcast Domain และป้องกันการชนกันของสัญญาณ 100%</div>
+                </div>
+            </div>
+
+            <!-- Hotspot 4: Patch Panel -->
+            <div class="hotspot-item category-cabling bottom-[6%] left-[4%] sm:bottom-[8%] sm:left-[8%] z-30" id="hotspot-wrap-4" onmouseenter="playChimeSound(true)">
+                <div class="hotspot-node group relative flex flex-col items-center">
+                    <span class="animate-ring absolute inset-0 rounded-full bg-amber-400"></span>
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-amber-600 to-orange-500 border-2 border-white text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-xl shadow-amber-500/60">
+                        <i class="fa-solid fa-ethernet"></i>
+                    </div>
+                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-amber-300 border border-amber-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">4. Patch Panel</span>
+                </div>
+                <div class="cyber-tooltip absolute bottom-full left-0 sm:left-2 mb-3 w-80 sm:w-96 bg-slate-900/98 border-2 border-amber-400 rounded-3xl p-5 text-sm space-y-3 backdrop-blur-2xl z-[80] shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
+                    <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+                        <span class="font-bold text-amber-300 text-xs sm:text-sm bg-amber-950 px-3 py-1 rounded-lg border border-amber-500/50 uppercase flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-amber-400"></i> Layer 1: Physical</span>
+                        <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> 10Gbps CAT6A</span>
+                    </div>
+                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">4. Patch Panel & Structured Cabling</h5>
+                    <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 text-xs sm:text-sm">
+                        <div class="flex justify-between text-slate-300"><span>มาตรฐานสาย:</span> <strong class="text-white font-mono font-semibold">Cat 6A 500MHz Shielded</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>มาตรฐานเข้าสาย:</span> <strong class="text-amber-300 font-mono font-semibold">TIA/EIA-568B, RJ-45</strong></div>
+                    </div>
+                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">แผงกระจายสายแลนศูนย์รวมจุดเชื่อมต่อจากทุกห้องเข้าสู่ตู้ Rack ช่วยจัดสายเป็นระเบียบ ซ่อมบำรุงและสลับพอร์ตได้สะดวกรวดเร็ว</p>
+                    <div class="p-3 bg-amber-950/70 rounded-xl border border-amber-500/40 text-xs sm:text-sm text-amber-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>เทคนิคช่าง:</strong> คลายเกลียวคู่สายก่อนเข้าพอร์ตไม่เกิน 1.3 ซม. เพื่อกัน Crosstalk</div>
+                </div>
+            </div>
+
+            <!-- Hotspot 5: Wi-Fi 7 -->
+            <div class="hotspot-item category-cabling bottom-[6%] right-[4%] sm:bottom-[8%] sm:right-[8%] z-30" id="hotspot-wrap-5" onmouseenter="playChimeSound(true)">
+                <div class="hotspot-node group relative flex flex-col items-center">
+                    <span class="animate-ring absolute inset-0 rounded-full bg-emerald-400"></span>
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 border-2 border-white text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-xl shadow-emerald-500/60">
+                        <i class="fa-solid fa-wifi"></i>
+                    </div>
+                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-emerald-300 border border-emerald-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">5. Wi-Fi 7 AP</span>
+                </div>
+                <div class="cyber-tooltip absolute bottom-full right-0 sm:right-2 mb-3 w-80 sm:w-96 bg-slate-900/98 border-2 border-emerald-400 rounded-3xl p-5 text-sm space-y-3 backdrop-blur-2xl z-[80] shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
+                    <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+                        <span class="font-bold text-emerald-300 text-xs sm:text-sm bg-emerald-950 px-3 py-1 rounded-lg border border-emerald-500/50 uppercase flex items-center gap-1.5"><i class="fa-solid fa-wifi text-emerald-400"></i> Layer 1 - 2: Wireless</span>
+                        <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> 9.3 Gbps READY</span>
+                    </div>
+                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">5. Enterprise Wi-Fi 7 Access Point</h5>
+                    <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 text-xs sm:text-sm">
+                        <div class="flex justify-between text-slate-300"><span>ย่านความถี่:</span> <strong class="text-white font-mono font-semibold">Tri-Band 2.4/5/6 GHz</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>ความปลอดภัย:</span> <strong class="text-emerald-300 font-mono font-semibold">WPA3, 4x4 MU-MIMO</strong></div>
+                    </div>
+                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">จุดกระจายสัญญาณอินเทอร์เน็ตไร้สายสำหรับแล็ปท็อป สมาร์ตโฟน และอุปกรณ์ IoT รองรับผู้ใช้งานหนาแน่นพร้อมกันหลายร้อยเครื่องแบบไร้รอยต่อ</p>
+                    <div class="p-3 bg-emerald-950/70 rounded-xl border border-emerald-500/40 text-xs sm:text-sm text-emerald-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>เทคโนโลยีเด่น:</strong> MLO (Multi-Link Operation) เชื่อมหลายย่านความถี่พร้อมกัน Latency ต่ำกว่า 5ms</div>
+                </div>
+            </div>
+
+            <!-- Hotspot 6: Data Server -->
+            <div class="hotspot-item category-security top-[44%] right-[2%] sm:top-[44%] sm:right-[4%] z-30" id="hotspot-wrap-6" onmouseenter="playChimeSound(true)">
+                <div class="hotspot-node group relative flex flex-col items-center">
+                    <span class="animate-ring absolute inset-0 rounded-full bg-purple-400"></span>
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 border-2 border-white text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-xl shadow-purple-500/60">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-purple-300 border border-purple-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">6. Data Server</span>
+                </div>
+                <div class="cyber-tooltip absolute top-[-30px] right-full mr-4 w-80 sm:w-96 bg-slate-900/98 border-2 border-purple-400 rounded-3xl p-5 text-sm space-y-3 backdrop-blur-2xl z-[80] shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
+                    <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+                        <span class="font-bold text-purple-300 text-xs sm:text-sm bg-purple-950 px-3 py-1 rounded-lg border border-purple-500/50 uppercase flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-purple-400"></i> Layer 7: Application</span>
+                        <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> RAID 10 HEALTHY</span>
+                    </div>
+                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">6. Data Server & Backup Vault</h5>
+                    <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 text-xs sm:text-sm">
+                        <div class="flex justify-between text-slate-300"><span>สเปกประมวลผล:</span> <strong class="text-white font-mono font-semibold">Dual Xeon, 128GB ECC RAM</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>โพรโทคอลบริการ:</span> <strong class="text-purple-300 font-mono font-semibold">HTTPS, SFTP, NFS, SMB 3.0</strong></div>
+                    </div>
+                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">ให้บริการประมวลผล จัดเก็บฐานข้อมูล และสำรองข้อมูลแบบ 3-2-1 Backup ป้องกันความเสียหายจากไวรัสเรียกค่าไถ่ Ransomware</p>
+                    <div class="p-3 bg-purple-950/70 rounded-xl border border-purple-500/40 text-xs sm:text-sm text-purple-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>เสาหลัก CIA:</strong> ข้อ Availability ความพร้อมใช้งาน เกิดจาก RAID และระบบสำรองไฟ UPS</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Padlet Actions for Standalone 1 -->
+        <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <span class="text-slate-400"><i class="fa-solid fa-share-nodes text-cyan-400 mr-1"></i> ลิงก์ตรงสำหรับส่งงาน Padlet (ชิ้นที่ 1):</span>
+            <button onclick="copyCurrentLink(this)" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-4 py-2 rounded-xl transition-all shadow active:scale-95 flex items-center gap-1.5">
+                <i class="fa-regular fa-copy"></i>
+                <span>Copy Link ชิ้นที่ 1</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Mini Bottom Copyright -->
+    <div class="max-w-6xl w-full mx-auto mt-4 text-center text-[10px] text-slate-500">
+        © 2026 Interactive Learning Lab • พัฒนาโดย ครูชัยธวัฒน์ ศรีแสนวรกุล (ครูไนท์)
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-6 right-4 z-50 bg-slate-900 border-2 border-cyan-400 text-white px-4 py-2.5 rounded-2xl shadow-2xl text-xs flex items-center gap-2 transform translate-y-[-150%] transition-transform duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-cyan-400 text-base"></i>
+        <span id="toast-message">คัดลอกลิงก์สำเร็จ!</span>
+    </div>
+
+    <script>
+        let soundEnabled = true;
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('sound-icon');
+            if (soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high';
+                showToast('เปิดเสียงเอฟเฟกต์แล้ว');
+                playChimeSound(true);
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-slate-500';
+                showToast('ปิดเสียงแล้ว');
+            }
+        }
+
+        function playChimeSound(isCorrect) {
+            if (!soundEnabled) return;
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            } catch (e) {}
+        }
+
+        let toastTimeout = null;
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-[-150%]');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-[-150%]');
+            }, 2500);
+        }
+
+        function filterHotspots(cat, btnElem) {
+            document.querySelectorAll('.hotspot-filter-btn').forEach(btn => {
+                btn.className = 'hotspot-filter-btn px-3 py-1 rounded-xl bg-slate-800 text-slate-300 hover:text-white';
+            });
+            if (btnElem) {
+                btnElem.className = 'hotspot-filter-btn px-3 py-1 rounded-xl bg-cyan-600 text-white font-semibold shadow';
+            }
+
+            document.querySelectorAll('.hotspot-item').forEach(item => {
+                if (cat === 'all' || item.classList.contains('category-' + cat)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            playChimeSound(true);
+        }
+
+        let autoTourTimer = null;
+        function startAutoTour() {
+            let tourIndex = 1;
+            document.querySelectorAll('.hotspot-item').forEach(el => el.classList.remove('active-hold'));
+            const first = document.getElementById('hotspot-wrap-' + tourIndex);
+            if (first) first.classList.add('active-hold');
+            playChimeSound(true);
+
+            clearInterval(autoTourTimer);
+            autoTourTimer = setInterval(() => {
+                document.querySelectorAll('.hotspot-item').forEach(el => el.classList.remove('active-hold'));
+                tourIndex++;
+                if (tourIndex > 6) {
+                    clearInterval(autoTourTimer);
+                    showToast('🎉 จบทัวร์สำรวจอุปกรณ์ครบทั้ง 6 จุดเรียบร้อย!');
+                } else {
+                    const next = document.getElementById('hotspot-wrap-' + tourIndex);
+                    if (next) {
+                        next.classList.add('active-hold');
+                        playChimeSound(true);
+                    }
+                }
+            }, 3500);
+            showToast('เริ่มทัวร์แสดง Tooltip อัตโนมัติ (เปลี่ยนจุดทุก 3.5 วินาที)');
+        }
+
+        function copyCurrentLink(btnElem) {
+            const url = window.location.href;
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(() => {
+                    handleCopySuccess(btnElem);
+                }).catch(() => fallbackCopy(url, btnElem));
+            } else {
+                fallbackCopy(url, btnElem);
+            }
+        }
+
+        function fallbackCopy(text, btnElem) {
+            const temp = document.createElement('textarea');
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            handleCopySuccess(btnElem);
+        }
+
+        function handleCopySuccess(btnElem) {
+            showToast('คัดลอกลิงก์ชิ้นที่ 1 สำเร็จ!');
+            playChimeSound(true);
+            if (btnElem) {
+                const originalText = btnElem.innerHTML;
+                btnElem.innerHTML = '<i class="fa-solid fa-check text-emerald-300"></i> สำเร็จ!';
+                btnElem.classList.add('bg-emerald-600');
+                setTimeout(() => {
+                    btnElem.innerHTML = originalText;
+                    btnElem.classList.remove('bg-emerald-600');
+                }, 2000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.hotspot-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const wasActive = item.classList.contains('active-hold');
+                    document.querySelectorAll('.hotspot-item').forEach(el => el.classList.remove('active-hold'));
+                    if (!wasActive) {
+                        item.classList.add('active-hold');
+                        playChimeSound(true);
+                    }
+                });
+            });
+
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.hotspot-item').forEach(el => el.classList.remove('active-hold'));
+            });
+        });
+    </script>
+</body>
+</html>

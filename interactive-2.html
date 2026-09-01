@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>ชิ้นที่ 2: Interactive Video & เข้าสายแลน Simulator | NiceKung</title>
+    <link rel="icon" type="image/png" href="image/logo.png">
+    
+    <!-- Google Fonts: Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons 6.5.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Kanit', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #0b1329;
+            color: #f1f5f9;
+        }
+
+        .bg-grid-cyber {
+            background-image: 
+                radial-gradient(rgba(14, 165, 233, 0.15) 1px, transparent 1px),
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 28px 28px, 56px 56px, 56px 56px;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased min-h-screen p-3 sm:p-6 bg-grid-cyber flex flex-col justify-between">
+
+    <!-- Standalone Mini Header Bar -->
+    <div class="max-w-6xl w-full mx-auto mb-4 flex items-center justify-between bg-slate-900/90 border border-amber-500/30 rounded-2xl p-3 sm:p-4 backdrop-blur-md shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg border border-amber-400/40">
+                <i class="fa-solid fa-circle-play"></i>
+            </div>
+            <div>
+                <span class="text-[10px] uppercase font-bold text-amber-400 tracking-wider">INTERACTIVE PIECE #2</span>
+                <h1 class="text-sm sm:text-base font-black text-white leading-tight">Interactive Video: เข้าสายแลน & เครื่องจำลองสี T568B</h1>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-amber-500/30 text-xs hidden sm:flex items-center gap-2">
+                <span class="text-slate-400">Checkpoint:</span>
+                <span id="video-score-badge" class="font-black text-amber-400 font-mono">0 / 3 ข้อ</span>
+            </div>
+            <a href="interactive.html" target="_top" class="hidden sm:inline-flex items-center gap-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-xl border border-slate-700 transition-all">
+                <i class="fa-solid fa-layer-group text-amber-400"></i>
+                <span>ดูทั้ง 3 ชิ้น</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="max-w-6xl w-full mx-auto bg-slate-900/90 border border-amber-500/40 rounded-3xl p-4 sm:p-6 shadow-2xl backdrop-blur-xl space-y-6">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left: Video Player & Simulator (8 Cols) -->
+            <div class="lg:col-span-8 space-y-5">
+                
+                <!-- Video Player with Overlay Checkpoints -->
+                <div class="relative w-full rounded-2xl overflow-hidden border-2 border-amber-500/40 shadow-2xl bg-slate-950">
+                    <div class="relative w-full" style="padding-top: 56.25%;">
+                        <iframe 
+                            id="interactive-yt-frame"
+                            class="absolute top-0 left-0 w-full h-full"
+                            src="https://www.youtube.com/embed/7zd0oycQrHA?enablejsapi=1" 
+                            title="การเข้าหัวสายแลน RJ45 ด้วยตัวเองแบบง่ายๆ" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+
+                    <!-- Overlay Checkpoint Modal -->
+                    <div id="video-checkpoint-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md p-4 sm:p-6 flex flex-col justify-center items-center text-center hidden z-30 transition-all">
+                        <div class="max-w-md w-full bg-slate-900 p-5 sm:p-6 rounded-3xl border-2 border-amber-400 shadow-2xl space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span id="cp-modal-badge" class="text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40 px-3 py-1 rounded-full uppercase">
+                                    <i class="fa-solid fa-flag-checkered mr-1"></i> Checkpoint 1
+                                </span>
+                                <span class="text-xs text-slate-400 font-mono"><i class="fa-solid fa-clock mr-1"></i> <span id="cp-modal-time">0:45</span></span>
+                            </div>
+
+                            <h4 id="cp-modal-question" class="text-sm sm:text-base font-bold text-white text-left">
+                                การปอกเปลือกนอกของสาย UTP ควรปอกลึกประมาณกี่เซนติเมตร?
+                            </h4>
+
+                            <div id="cp-modal-options" class="space-y-2 text-xs text-left"></div>
+                            <div id="cp-modal-feedback" class="p-3 rounded-xl text-xs text-left hidden"></div>
+
+                            <button id="cp-modal-continue-btn" onclick="resumeVideoAfterCheckpoint()" class="w-full bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 text-white font-bold py-2.5 rounded-xl transition-all shadow-md hidden active:scale-95">
+                                <i class="fa-solid fa-circle-check mr-1"></i> รับทราบแล้ว ดูคลิปต่อ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Checkpoints Selector Bar -->
+                <div class="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between text-xs text-slate-400">
+                        <span class="font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-list-check text-amber-400"></i> จุดเช็คทักษะในคลิป:</span>
+                        <span>แตะเพื่อทดสอบความรู้ตามช่วงเวลา</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="triggerCheckpoint(1)" class="p-2 rounded-xl bg-slate-800 hover:bg-amber-600/30 text-slate-300 hover:text-white border border-slate-700 hover:border-amber-500 text-xs font-semibold transition-all text-left flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0">1</span>
+                            <div class="truncate">
+                                <span class="block text-[10px] text-slate-400">0:45 นาที</span>
+                                <span class="truncate block">ปอกสาย UTP</span>
+                            </div>
+                        </button>
+                        <button onclick="triggerCheckpoint(2)" class="p-2 rounded-xl bg-slate-800 hover:bg-amber-600/30 text-slate-300 hover:text-white border border-slate-700 hover:border-amber-500 text-xs font-semibold transition-all text-left flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0">2</span>
+                            <div class="truncate">
+                                <span class="block text-[10px] text-slate-400">1:30 นาที</span>
+                                <span class="truncate block">เรียงสี T568B</span>
+                            </div>
+                        </button>
+                        <button onclick="triggerCheckpoint(3)" class="p-2 rounded-xl bg-slate-800 hover:bg-amber-600/30 text-slate-300 hover:text-white border border-slate-700 hover:border-amber-500 text-xs font-semibold transition-all text-left flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs shrink-0">3</span>
+                            <div class="truncate">
+                                <span class="block text-[10px] text-slate-400">2:15 นาที</span>
+                                <span class="truncate block">ตรวจ Tester</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Virtual RJ-45 Pinout Simulator -->
+                <div class="p-5 bg-slate-950/90 rounded-3xl border-2 border-amber-500/40 shadow-xl space-y-4">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <div>
+                            <span class="text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full uppercase">Virtual Lab</span>
+                            <h3 class="text-sm sm:text-base font-black text-white mt-0.5">เครื่องจำลองจัดเรียงสีสายแลน (T568B Pinout Simulator)</h3>
+                        </div>
+                        <button onclick="resetWireSimulator()" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">
+                            <i class="fa-solid fa-rotate-right mr-1"></i> รีเซ็ตสาย
+                        </button>
+                    </div>
+
+                    <p class="text-xs text-slate-300">
+                        แตะคู่สายด้านล่างเพื่อเรียงเข้าช่องพิน <strong class="text-amber-300 font-mono">Pin 1 ถึง Pin 8</strong> ให้ถูกต้องตามมาตรฐาน T568B จากนั้นกดปุ่มทดสอบสาย
+                    </p>
+
+                    <!-- Slots 1 - 8 -->
+                    <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800">
+                        <div class="text-[11px] font-bold text-amber-400 mb-2 flex items-center justify-between">
+                            <span><i class="fa-solid fa-microchip mr-1"></i> หัว RJ-45 Modular Plug (ช่องพิน 1 - 8):</span>
+                            <span id="wire-slots-count" class="font-mono text-slate-400">เรียงแล้ว 0 / 8 พิน</span>
+                        </div>
+                        <div class="grid grid-cols-8 gap-1 sm:gap-2 text-center" id="wire-slots-container"></div>
+                    </div>
+
+                    <!-- Color Wires Pool -->
+                    <div>
+                        <div class="text-[11px] font-bold text-slate-300 mb-2">แตะสายสีที่ต้องการเพื่อสอดเข้าหัว RJ-45:</div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="wire-pool-container"></div>
+                    </div>
+
+                    <!-- Cable Tester LED Output -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-slate-800">
+                        <div class="flex items-center gap-1.5" id="tester-leds-bar">
+                            <span class="text-xs text-slate-400 mr-1 font-mono">Tester LED:</span>
+                            <span class="w-3.5 h-3.5 rounded-full bg-slate-800 border border-slate-700 led-dot" id="led-1"></span>
+                            <span class="w-3.5 h-3.5 rounded-full bg-slate-800 border border-slate-700 led-dot" id="led-2"></span>
+                            <span class="w-3.5 h-3.5 rounded-full bg-slate-800 border border-slate-700 led-dot" id="led-3"></span>
+                            <span class="w-3.5 h-3.5 rounded-full bg-slate-800 border border-slate-700 led-dot" id="led-4"></span>
+                            <span class="w-3.5 h-3.5 rounded-full bg-slate-800 border border-slate-700 led-dot" id="led-5"></span>
+                            <span class="w-3.5 h-3.5 rounded-full bg-slate-800 border border-slate-700 led-dot" id="led-6"></span>
+                            <span class="w-3.5 h-3.5 rounded-full bg-slate-800 border border-slate-700 led-dot" id="led-7"></span>
+                            <span class="w-3.5 h-3.5 rounded-full bg-slate-800 border border-slate-700 led-dot" id="led-8"></span>
+                        </div>
+
+                        <button onclick="testWireSequence()" class="w-full sm:w-auto bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 text-white font-bold py-2 px-5 rounded-xl transition-all shadow text-xs flex items-center justify-center gap-1.5 active:scale-95">
+                            <i class="fa-solid fa-bolt"></i>
+                            <span>ทดสอบสัญญาณด้วย Cable Tester</span>
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Right: Standards Guide (4 Cols) -->
+            <div class="lg:col-span-4 space-y-4">
+                <div class="bg-slate-950 p-4 sm:p-5 rounded-2xl border border-amber-500/30 space-y-3">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-amber-400"></i> เกณฑ์ประเมินทักษะปฏิบัติ
+                    </h3>
+                    <ul class="space-y-2.5 text-xs text-slate-300">
+                        <li class="flex items-start gap-2">
+                            <i id="check-icon-1" class="fa-regular fa-circle text-slate-500 mt-0.5"></i>
+                            <span>ปอกฉนวนนอกระยะ 2.5 ซม. ตัวนำทองแดงไม่ขาด</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i id="check-icon-2" class="fa-regular fa-circle text-slate-500 mt-0.5"></i>
+                            <span>เรียงสี T568B ทั้ง 8 พินได้ถูกต้อง</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i id="check-icon-3" class="fa-regular fa-circle text-slate-500 mt-0.5"></i>
+                            <span>สอดสายเข้าหัว RJ-45 แนบสนิทและย้ำแน่น</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="p-4 bg-gradient-to-br from-slate-950 to-amber-950/40 rounded-2xl border border-amber-500/30 text-xs space-y-2 text-slate-300">
+                    <strong class="text-amber-300 block"><i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i> ลำดับสีมาตรฐาน T568B (Pin 1 - 8):</strong>
+                    <ol class="text-[11px] leading-relaxed text-slate-300 space-y-1 font-mono list-decimal list-inside">
+                        <li>ขาวส้ม (White-Orange)</li>
+                        <li>ส้ม (Orange)</li>
+                        <li>ขาวเขียว (White-Green)</li>
+                        <li>น้ำเงิน (Blue)</li>
+                        <li>ขาวน้ำเงิน (White-Blue)</li>
+                        <li>เขียว (Green)</li>
+                        <li>ขาวน้ำตาล (White-Brown)</li>
+                        <li>น้ำตาล (Brown)</li>
+                    </ol>
+                </div>
+
+                <!-- Padlet Actions for Standalone 2 -->
+                <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between gap-2 text-xs">
+                    <span class="text-slate-400"><i class="fa-solid fa-share-nodes text-amber-400 mr-1"></i> ส่งงาน Padlet:</span>
+                    <button onclick="copyCurrentLink(this)" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-3.5 py-1.5 rounded-xl transition-all shadow active:scale-95 flex items-center gap-1">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>Copy Link ชิ้นที่ 2</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Mini Bottom Copyright -->
+    <div class="max-w-6xl w-full mx-auto mt-4 text-center text-[10px] text-slate-500">
+        © 2026 Interactive Learning Lab • พัฒนาโดย ครูชัยธวัฒน์ ศรีแสนวรกุล (ครูไนท์)
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-6 right-4 z-50 bg-slate-900 border-2 border-amber-400 text-white px-4 py-2.5 rounded-2xl shadow-2xl text-xs flex items-center gap-2 transform translate-y-[-150%] transition-transform duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-amber-400 text-base"></i>
+        <span id="toast-message">คัดลอกลิงก์สำเร็จ!</span>
+    </div>
+
+    <script>
+        let soundEnabled = true;
+        function playChimeSound(isCorrect) {
+            if (!soundEnabled) return;
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                if (isCorrect) {
+                    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.3);
+                } else {
+                    osc.frequency.setValueAtTime(220, ctx.currentTime);
+                    osc.frequency.setValueAtTime(164.81, ctx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.25);
+                }
+            } catch (e) {}
+        }
+
+        let toastTimeout = null;
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-[-150%]');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-[-150%]');
+            }, 2500);
+        }
+
+        const checkpointData = {
+            1: {
+                timeStr: "0:45",
+                badge: "Checkpoint 1: การปอกฉนวนสาย",
+                question: "1. ในขั้นตอนแรกของการเข้าหัวสายแลน ควรปอกเปลือกนอกของสาย UTP ลึกประมาณเท่าใด?",
+                options: [
+                    { text: "ก. ประมาณ 0.5 เซนติเมตร", correct: false },
+                    { text: "ข. ประมาณ 2.5 - 3.0 เซนติเมตร", correct: true },
+                    { text: "ค. ประมาณ 10 เซนติเมตร", correct: false },
+                    { text: "ง. ปอกจนถึงกึ่งกลางของสายทั้งหมด", correct: false }
+                ],
+                explanation: "ถูกต้อง! การปอกเปลือกนอกประมาณ 2.5 - 3.0 ซม. ช่วยให้มีระยะเพียงพอในการคลายเกลียวและรีดดัดสายให้ตรงเรียงสีก่อนตัดปลายเสมอ"
+            },
+            2: {
+                timeStr: "1:30",
+                badge: "Checkpoint 2: การเรียงสีมาตรฐาน T568B",
+                question: "2. มาตรฐานการเรียงสีสายแลนแบบ TIA/EIA-568B สองเส้นแรก (Pin 1 และ Pin 2) คือสีอะไร?",
+                options: [
+                    { text: "ก. ขาวเขียว, เขียว", correct: false },
+                    { text: "ข. ขาวส้ม, ส้ม", correct: true },
+                    { text: "ค. ขาวน้ำเงิน, น้ำเงิน", correct: false },
+                    { text: "ง. ขาวน้ำตาล, น้ำตาล", correct: false }
+                ],
+                explanation: "ถูกต้อง! มาตรฐาน T568B เริ่มต้นด้วย พิน 1: ขาวส้ม และ พิน 2: ส้ม (ทำหน้าที่คู่สายส่งสัญญาณ Transmit: Tx)"
+            },
+            3: {
+                timeStr: "2:15",
+                badge: "Checkpoint 3: การตรวจเช็คด้วย Cable Tester",
+                question: "3. เมื่อนำสายตรง (Straight-Through) ทั้ง 2 ด้านมาทดสอบด้วยเครื่อง Cable Tester ไฟ LED ควรวิ่งอย่างไร?",
+                options: [
+                    { text: "ก. ไฟ LED 1 ถึง 8 สว่างติดเรียงลำดับพร้อมกันทั้ง Master และ Remote", correct: true },
+                    { text: "ข. สว่างสลับฟันปลาเฉพาะเลขคี่ 1, 3, 5, 7", correct: false },
+                    { text: "ค. สว่างเฉพาะพินที่ 1 และ 2 เท่านั้น", correct: false },
+                    { text: "ง. ไฟกระพริบสีแดงเตือนทุกดวงพร้อมกัน", correct: false }
+                ],
+                explanation: "ถูกต้อง! สายตรงที่สมบูรณ์ ไฟ LED ลำดับที่ 1 ถึง 8 จะวิ่งตรงกันทีละดวงอย่างต่อเนื่องทั้ง 2 ฝั่ง"
+            }
+        };
+
+        let videoScore = 0;
+        let answeredCP = { 1: false, 2: false, 3: false };
+
+        function triggerCheckpoint(cpId) {
+            const data = checkpointData[cpId];
+            if (!data) return;
+
+            document.getElementById('cp-modal-badge').innerHTML = '<i class="fa-solid fa-flag-checkered mr-1"></i> ' + data.badge;
+            document.getElementById('cp-modal-time').innerText = data.timeStr;
+            document.getElementById('cp-modal-question').innerText = data.question;
+
+            const optContainer = document.getElementById('cp-modal-options');
+            optContainer.innerHTML = '';
+
+            data.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left transition-all flex items-center justify-between text-slate-200 cursor-pointer";
+                btn.innerHTML = '<span>' + opt.text + '</span> <i class="fa-regular fa-circle text-slate-500"></i>';
+                btn.onclick = () => selectCPOption(cpId, idx, opt.correct, data.explanation, btn);
+                optContainer.appendChild(btn);
+            });
+
+            document.getElementById('cp-modal-feedback').className = "p-3 rounded-xl text-xs text-left hidden";
+            document.getElementById('cp-modal-continue-btn').classList.add('hidden');
+            document.getElementById('video-checkpoint-modal').classList.remove('hidden');
+            playChimeSound(true);
+        }
+
+        function selectCPOption(cpId, idx, isCorrect, explanation, btnElem) {
+            const feedback = document.getElementById('cp-modal-feedback');
+            const contBtn = document.getElementById('cp-modal-continue-btn');
+
+            document.querySelectorAll('#cp-modal-options button').forEach(b => {
+                b.disabled = true;
+                b.classList.add('opacity-60');
+            });
+
+            btnElem.classList.remove('opacity-60');
+            if (isCorrect) {
+                btnElem.classList.add('bg-emerald-950', 'border-emerald-500', 'text-emerald-300');
+                btnElem.querySelector('i').className = "fa-solid fa-circle-check text-emerald-400";
+                feedback.className = "p-3 rounded-xl text-xs text-left bg-emerald-950/90 border border-emerald-500 text-emerald-200";
+                feedback.innerHTML = '<strong class="text-white block mb-1">🎉 ถูกต้องยอดเยี่ยม!</strong> ' + explanation;
+
+                if (!answeredCP[cpId]) {
+                    videoScore++;
+                    answeredCP[cpId] = true;
+                    document.getElementById('video-score-badge').innerText = videoScore + ' / 3 ข้อ';
+                    document.getElementById('check-icon-' + cpId).className = "fa-solid fa-circle-check text-emerald-400 mt-0.5";
+                }
+                playChimeSound(true);
+            } else {
+                btnElem.classList.add('bg-rose-950', 'border-rose-500', 'text-rose-300');
+                btnElem.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-400";
+                feedback.className = "p-3 rounded-xl text-xs text-left bg-rose-950/90 border border-rose-500 text-rose-200";
+                feedback.innerHTML = '<strong class="text-white block mb-1">❌ ยังไม่ถูกต้อง</strong> ' + explanation;
+                playChimeSound(false);
+            }
+
+            feedback.classList.remove('hidden');
+            contBtn.classList.remove('hidden');
+        }
+
+        function resumeVideoAfterCheckpoint() {
+            document.getElementById('video-checkpoint-modal').classList.add('hidden');
+            showToast("รับชมวิดีโอต่อได้เลยครับ!");
+        }
+
+        const standardColorsT568B = [
+            { id: 'wo', name: 'ขาวส้ม', code: '#fb923c', border: 'border-orange-400' },
+            { id: 'o',  name: 'ส้ม',    code: '#ea580c', border: 'border-orange-600' },
+            { id: 'wg', name: 'ขาวเขียว', code: '#4ade80', border: 'border-emerald-400' },
+            { id: 'b',  name: 'น้ำเงิน', code: '#2563eb', border: 'border-blue-600' },
+            { id: 'wb', name: 'ขาวน้ำเงิน', code: '#60a5fa', border: 'border-blue-400' },
+            { id: 'g',  name: 'เขียว',  code: '#16a34a', border: 'border-emerald-600' },
+            { id: 'wbr', name: 'ขาวน้ำตาล', code: '#a8715a', border: 'border-amber-600' },
+            { id: 'br', name: 'น้ำตาล', code: '#78350f', border: 'border-amber-900' }
+        ];
+
+        let placedWires = [];
+
+        function initWireSimulator() {
+            placedWires = [];
+            renderWireSlots();
+            renderWirePool();
+        }
+
+        function renderWireSlots() {
+            const container = document.getElementById('wire-slots-container');
+            container.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                const wire = placedWires[i];
+                const slot = document.createElement('div');
+                slot.className = "flex flex-col items-center gap-1 p-1 rounded-xl bg-slate-900 border border-slate-800";
+                
+                if (wire) {
+                    slot.innerHTML = '<span class="text-[10px] text-slate-400 font-mono">P' + (i + 1) + '</span><div class="w-full h-12 rounded-lg border-2 ' + wire.border + ' flex items-center justify-center text-[10px] font-bold text-white shadow-inner" style="background-color: ' + wire.code + '">' + wire.name.substring(0, 2) + '</div>';
+                } else {
+                    slot.innerHTML = '<span class="text-[10px] text-slate-500 font-mono">P' + (i + 1) + '</span><div class="w-full h-12 rounded-lg border border-dashed border-slate-700 bg-slate-950 flex items-center justify-center text-[10px] text-slate-600">ว่าง</div>';
+                }
+                container.appendChild(slot);
+            }
+            document.getElementById('wire-slots-count').innerText = 'เรียงแล้ว ' + placedWires.length + ' / 8 พิน';
+        }
+
+        function renderWirePool() {
+            const pool = document.getElementById('wire-pool-container');
+            pool.innerHTML = '';
+            standardColorsT568B.forEach(wire => {
+                const btn = document.createElement('button');
+                const isUsed = placedWires.some(w => w.id === wire.id);
+                btn.className = 'p-2 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-all ' + (isUsed ? 'opacity-30 pointer-events-none bg-slate-900 border-slate-800' : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-white cursor-pointer');
+                btn.innerHTML = '<span class="w-4 h-4 rounded-full border-2 ' + wire.border + ' shrink-0" style="background-color: ' + wire.code + '"></span><span class="truncate">' + wire.name + '</span>';
+                btn.onclick = () => addWireToSlot(wire);
+                pool.appendChild(btn);
+            });
+        }
+
+        function addWireToSlot(wire) {
+            if (placedWires.length >= 8) {
+                showToast('ครบ 8 ช่องแล้วครับ กดปุ่มทดสอบสายได้เลย');
+                return;
+            }
+            placedWires.push(wire);
+            renderWireSlots();
+            renderWirePool();
+            playChimeSound(true);
+        }
+
+        function resetWireSimulator() {
+            placedWires = [];
+            renderWireSlots();
+            renderWirePool();
+            for (let i = 1; i <= 8; i++) {
+                const led = document.getElementById('led-' + i);
+                if (led) led.className = "w-3.5 h-3.5 rounded-full bg-slate-800 border border-slate-700 led-dot";
+            }
+            showToast('รีเซ็ตสายแลนแล้ว');
+        }
+
+        function testWireSequence() {
+            if (placedWires.length < 8) {
+                showToast('⚠️ กรุณาเรียงสายให้ครบทั้ง 8 พินก่อนทดสอบครับ');
+                playChimeSound(false);
+                return;
+            }
+
+            let isAllCorrect = true;
+            for (let i = 0; i < 8; i++) {
+                if (placedWires[i].id !== standardColorsT568B[i].id) {
+                    isAllCorrect = false;
+                    break;
+                }
+            }
+
+            let ledIdx = 1;
+            const ledChaser = setInterval(() => {
+                if (ledIdx > 8) {
+                    clearInterval(ledChaser);
+                    if (isAllCorrect) {
+                        if (typeof confetti === 'function') {
+                            confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+                        }
+                        showToast('🎉 ถูกต้อง 100%! สายแลน T568B ไฟวิ่งติดครบ 8 พินสมบูรณ์');
+                    } else {
+                        showToast('❌ มีพินที่สลับสีผิด กรุณากดรีเซ็ตแล้วเรียงใหม่ตามคู่มือ');
+                        playChimeSound(false);
+                    }
+                    return;
+                }
+
+                const wireMatch = placedWires[ledIdx - 1].id === standardColorsT568B[ledIdx - 1].id;
+                const led = document.getElementById('led-' + ledIdx);
+                if (led) {
+                    led.className = wireMatch 
+                        ? "w-3.5 h-3.5 rounded-full bg-emerald-400 border border-white shadow-[0_0_8px_#34d399] led-dot"
+                        : "w-3.5 h-3.5 rounded-full bg-rose-500 border border-white shadow-[0_0_8px_#f43f5e] led-dot";
+                }
+                playChimeSound(wireMatch);
+                ledIdx++;
+            }, 200);
+        }
+
+        function copyCurrentLink(btnElem) {
+            const url = window.location.href;
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(() => {
+                    handleCopySuccess(btnElem);
+                }).catch(() => fallbackCopy(url, btnElem));
+            } else {
+                fallbackCopy(url, btnElem);
+            }
+        }
+
+        function fallbackCopy(text, btnElem) {
+            const temp = document.createElement('textarea');
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            handleCopySuccess(btnElem);
+        }
+
+        function handleCopySuccess(btnElem) {
+            showToast('คัดลอกลิงก์ชิ้นที่ 2 สำเร็จ!');
+            playChimeSound(true);
+            if (btnElem) {
+                const originalText = btnElem.innerHTML;
+                btnElem.innerHTML = '<i class="fa-solid fa-check text-emerald-300"></i> สำเร็จ!';
+                btnElem.classList.add('bg-emerald-600');
+                setTimeout(() => {
+                    btnElem.innerHTML = originalText;
+                    btnElem.classList.remove('bg-emerald-600');
+                }, 2000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initWireSimulator();
+        });
+    </script>
+</body>
+</html>

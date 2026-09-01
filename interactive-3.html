@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ชิ้นที่ 3: Interactive Game จัดชั้น OSI & Cyber Defense | NiceKung</title>
+    <link rel="icon" type="image/png" href="image/logo.png">
+    
+    <!-- Google Fonts: Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons 6.5.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Kanit', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #0b1329;
+            color: #f1f5f9;
+        }
+
+        .bg-grid-cyber {
+            background-image: 
+                radial-gradient(rgba(14, 165, 233, 0.15) 1px, transparent 1px),
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 28px 28px, 56px 56px, 56px 56px;
+        }
+
+        .drag-card {
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+        }
+        .drag-card:active {
+            cursor: grabbing;
+            transform: scale(1.04);
+        }
+        .drag-card.card-selected {
+            outline: 3px solid #38bdf8;
+            background-color: rgba(14, 165, 233, 0.3) !important;
+            border-color: #38bdf8 !important;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+        }
+
+        .drop-zone {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .drop-zone.drag-over {
+            background-color: rgba(6, 182, 212, 0.25) !important;
+            border-color: #00f2fe !important;
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased min-h-screen p-3 sm:p-6 bg-grid-cyber flex flex-col justify-between">
+
+    <!-- Standalone Mini Header Bar -->
+    <div class="max-w-6xl w-full mx-auto mb-4 flex items-center justify-between bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-3 sm:p-4 backdrop-blur-md shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg border border-emerald-400/40">
+                <i class="fa-solid fa-gamepad"></i>
+            </div>
+            <div>
+                <span class="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">INTERACTIVE PIECE #3</span>
+                <h1 class="text-sm sm:text-base font-black text-white leading-tight">Interactive Game: เกมลาก-วางจัดชั้น OSI & Cyber</h1>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 text-xs flex items-center gap-2">
+                <i class="fa-solid fa-stopwatch text-cyan-400"></i>
+                <span id="game-timer" class="font-mono font-bold text-white">00:00</span>
+            </div>
+            <div class="bg-slate-800 px-3 py-1.5 rounded-xl border border-emerald-500/40 text-xs flex items-center gap-2">
+                <i class="fa-solid fa-trophy text-amber-400"></i>
+                <span id="game-score" class="font-mono font-black text-emerald-400 text-sm">0</span>
+            </div>
+            <a href="interactive.html" target="_top" class="hidden sm:inline-flex items-center gap-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-xl border border-slate-700 transition-all">
+                <i class="fa-solid fa-layer-group text-emerald-400"></i>
+                <span>ดูทั้ง 3 ชิ้น</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Game Container -->
+    <div class="max-w-6xl w-full mx-auto bg-slate-900/90 border border-emerald-500/40 rounded-3xl p-4 sm:p-6 shadow-2xl backdrop-blur-xl space-y-4">
+        
+        <!-- Game Instruction & Quick Control Buttons -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-800 text-xs">
+            <div class="flex items-center gap-2 text-slate-300">
+                <i class="fa-solid fa-circle-info text-emerald-400"></i>
+                <span>วิธีเล่น: <strong class="text-cyan-300">แตะเลือกการ์ด</strong> ทางซ้าย แล้วแตะลงในกล่องเป้าหมาย (หรือลาก-วาง)</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="giveGameHint()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-lightbulb"></i> ขอคำใบ้
+                </button>
+                <button onclick="resetGame()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-semibold hover:text-white transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-rotate-right"></i> เริ่มใหม่
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Cards & Drop Targets Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Cards Pool (5 Cols) -->
+            <div class="lg:col-span-5 space-y-3">
+                <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+                    <span class="font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-cyan-400"></i> การ์ดที่ต้องจัดหมวดหมู่ (<span id="cards-remaining">8</span> ใบ):</span>
+                    <span class="text-[11px] text-cyan-400">แตะการ์ด -> แตะกล่อง</span>
+                </div>
+                <div id="game-cards-pool" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 min-h-[280px] p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800"></div>
+            </div>
+
+            <!-- Target Buckets (7 Cols) -->
+            <div class="lg:col-span-7 space-y-2.5">
+                <div class="text-xs font-bold text-white px-1 flex items-center justify-between">
+                    <span><i class="fa-solid fa-bullseye text-emerald-400 mr-1"></i> โซนเป้าหมาย (OSI Layers & Security):</span>
+                    <span id="match-status" class="text-[11px] text-slate-400 font-normal">จับคู่สำเร็จ 0 / 8 ชิ้น</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    
+                    <!-- L7 -->
+                    <div class="drop-zone p-3.5 rounded-2xl bg-slate-900 border-2 border-dashed border-slate-700 hover:border-cyan-400 transition-all min-h-[85px] flex flex-col justify-between" data-layer="application">
+                        <div class="flex items-center justify-between text-xs mb-1">
+                            <span class="font-bold text-cyan-300">1. Layer 7: Application</span>
+                            <span class="text-[10px] bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded-md font-mono">Data</span>
+                        </div>
+                        <div class="zone-content flex flex-wrap gap-1.5 min-h-[34px]"></div>
+                    </div>
+
+                    <!-- L4 -->
+                    <div class="drop-zone p-3.5 rounded-2xl bg-slate-900 border-2 border-dashed border-slate-700 hover:border-blue-400 transition-all min-h-[85px] flex flex-col justify-between" data-layer="transport">
+                        <div class="flex items-center justify-between text-xs mb-1">
+                            <span class="font-bold text-blue-300">2. Layer 4: Transport</span>
+                            <span class="text-[10px] bg-blue-950 text-blue-400 px-2 py-0.5 rounded-md font-mono">Segments</span>
+                        </div>
+                        <div class="zone-content flex flex-wrap gap-1.5 min-h-[34px]"></div>
+                    </div>
+
+                    <!-- L3 -->
+                    <div class="drop-zone p-3.5 rounded-2xl bg-slate-900 border-2 border-dashed border-slate-700 hover:border-emerald-400 transition-all min-h-[85px] flex flex-col justify-between" data-layer="network">
+                        <div class="flex items-center justify-between text-xs mb-1">
+                            <span class="font-bold text-emerald-300">3. Layer 3: Network</span>
+                            <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded-md font-mono">Packets</span>
+                        </div>
+                        <div class="zone-content flex flex-wrap gap-1.5 min-h-[34px]"></div>
+                    </div>
+
+                    <!-- L2 -->
+                    <div class="drop-zone p-3.5 rounded-2xl bg-slate-900 border-2 border-dashed border-slate-700 hover:border-amber-400 transition-all min-h-[85px] flex flex-col justify-between" data-layer="datalink">
+                        <div class="flex items-center justify-between text-xs mb-1">
+                            <span class="font-bold text-amber-300">4. Layer 2: Data Link</span>
+                            <span class="text-[10px] bg-amber-950 text-amber-400 px-2 py-0.5 rounded-md font-mono">Frames</span>
+                        </div>
+                        <div class="zone-content flex flex-wrap gap-1.5 min-h-[34px]"></div>
+                    </div>
+
+                    <!-- L1 -->
+                    <div class="drop-zone p-3.5 rounded-2xl bg-slate-900 border-2 border-dashed border-slate-700 hover:border-orange-400 transition-all min-h-[85px] flex flex-col justify-between" data-layer="physical">
+                        <div class="flex items-center justify-between text-xs mb-1">
+                            <span class="font-bold text-orange-300">5. Layer 1: Physical</span>
+                            <span class="text-[10px] bg-orange-950 text-orange-400 px-2 py-0.5 rounded-md font-mono">Bits</span>
+                        </div>
+                        <div class="zone-content flex flex-wrap gap-1.5 min-h-[34px]"></div>
+                    </div>
+
+                    <!-- Defense -->
+                    <div class="drop-zone p-3.5 rounded-2xl bg-slate-900 border-2 border-dashed border-slate-700 hover:border-rose-400 transition-all min-h-[85px] flex flex-col justify-between" data-layer="security">
+                        <div class="flex items-center justify-between text-xs mb-1">
+                            <span class="font-bold text-rose-300"><i class="fa-solid fa-shield-halved mr-1"></i> Cyber Defense</span>
+                            <span class="text-[10px] bg-rose-950 text-rose-400 px-2 py-0.5 rounded-md font-mono">Protection</span>
+                        </div>
+                        <div class="zone-content flex flex-wrap gap-1.5 min-h-[34px]"></div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Padlet Actions for Standalone 3 -->
+        <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <span class="text-slate-400"><i class="fa-solid fa-share-nodes text-emerald-400 mr-1"></i> ลิงก์ตรงสำหรับส่งงาน Padlet (ชิ้นที่ 3):</span>
+            <button onclick="copyCurrentLink(this)" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-xl transition-all shadow active:scale-95 flex items-center gap-1.5">
+                <i class="fa-regular fa-copy"></i>
+                <span>Copy Link ชิ้นที่ 3</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Mini Bottom Copyright -->
+    <div class="max-w-6xl w-full mx-auto mt-4 text-center text-[10px] text-slate-500">
+        © 2026 Interactive Learning Lab • พัฒนาโดย ครูชัยธวัฒน์ ศรีแสนวรกุล (ครูไนท์)
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-6 right-4 z-50 bg-slate-900 border-2 border-emerald-400 text-white px-4 py-2.5 rounded-2xl shadow-2xl text-xs flex items-center gap-2 transform translate-y-[-150%] transition-transform duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toast-message">คัดลอกลิงก์สำเร็จ!</span>
+    </div>
+
+    <script>
+        let soundEnabled = true;
+        function playChimeSound(isCorrect) {
+            if (!soundEnabled) return;
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                if (isCorrect) {
+                    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.3);
+                } else {
+                    osc.frequency.setValueAtTime(220, ctx.currentTime);
+                    osc.frequency.setValueAtTime(164.81, ctx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.25);
+                }
+            } catch (e) {}
+        }
+
+        let toastTimeout = null;
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-[-150%]');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-[-150%]');
+            }, 2500);
+        }
+
+        const gameCardItems = [
+            { id: 'c1', name: 'HTTP / HTTPS (Web Data)', target: 'application', icon: 'fa-globe', color: 'text-cyan-400', hint: 'โพรโทคอลเว็บ ทำงานที่ Layer 7 (Application)' },
+            { id: 'c2', name: 'DNS Server (Name Resolve)', target: 'application', icon: 'fa-server', color: 'text-cyan-400', hint: 'บริการแปลงชื่อโดเมนเป็น IP อยู่ที่ Layer 7 (Application)' },
+            { id: 'c3', name: 'TCP 3-Way Handshake', target: 'transport', icon: 'fa-handshake', color: 'text-blue-400', hint: 'โพรโทคอลควบคุมการส่งข้อมูลที่น่าเชื่อถือ อยู่ที่ Layer 4 (Transport)' },
+            { id: 'c4', name: 'UDP Protocol (Streaming)', target: 'transport', icon: 'fa-bolt', color: 'text-blue-400', hint: 'โพรโทคอลส่งเร็วไม่รอตอบรับ อยู่ที่ Layer 4 (Transport)' },
+            { id: 'c5', name: 'IP Address & Core Router', target: 'network', icon: 'fa-route', color: 'text-emerald-400', hint: 'ที่อยู่เชิงตรรกะและการหาเส้นทาง อยู่ที่ Layer 3 (Network)' },
+            { id: 'c6', name: 'MAC Address & Switch', target: 'datalink', icon: 'fa-microchip', color: 'text-amber-400', hint: 'ที่อยู่ฮาร์ดแวร์และการส่ง Frame อยู่ที่ Layer 2 (Data Link)' },
+            { id: 'c7', name: 'Cat 6A UTP Cable & Bits', target: 'physical', icon: 'fa-ethernet', color: 'text-orange-400', hint: 'สายเคเบิลทองแดงและสัญญาณไฟฟ้า อยู่ที่ Layer 1 (Physical)' },
+            { id: 'c8', name: 'Hardware Firewall & MFA', target: 'security', icon: 'fa-shield-halved', color: 'text-rose-400', hint: 'ระบบเกราะป้องกันและไฟร์วอลล์ อยู่ในหมวด Cyber Defense' }
+        ];
+
+        let selectedGameCard = null;
+        let gameScore = 0;
+        let gameMatchedCount = 0;
+        let gameSeconds = 0;
+        let gameTimerInterval = null;
+
+        function initGame() {
+            gameScore = 0;
+            gameMatchedCount = 0;
+            gameSeconds = 0;
+            selectedGameCard = null;
+            document.getElementById('game-score').innerText = '0';
+            document.getElementById('match-status').innerText = 'จับคู่สำเร็จ 0 / 8 ชิ้น';
+            document.getElementById('cards-remaining').innerText = gameCardItems.length;
+
+            clearInterval(gameTimerInterval);
+            gameTimerInterval = setInterval(() => {
+                gameSeconds++;
+                const mins = String(Math.floor(gameSeconds / 60)).padStart(2, '0');
+                const secs = String(gameSeconds % 60).padStart(2, '0');
+                document.getElementById('game-timer').innerText = mins + ':' + secs;
+            }, 1000);
+
+            document.querySelectorAll('.drop-zone .zone-content').forEach(z => z.innerHTML = '');
+
+            const pool = document.getElementById('game-cards-pool');
+            pool.innerHTML = '';
+
+            const shuffled = [...gameCardItems].sort(() => Math.random() - 0.5);
+            shuffled.forEach(item => {
+                const card = document.createElement('div');
+                card.id = item.id;
+                card.className = "drag-card p-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-xs text-slate-200 font-medium flex items-center justify-between gap-2 shadow cursor-pointer transition-all";
+                card.draggable = true;
+                card.dataset.target = item.target;
+                card.dataset.id = item.id;
+
+                card.innerHTML = '<div class="flex items-center gap-2 truncate"><i class="fa-solid ' + item.icon + ' ' + item.color + ' text-sm"></i><span class="truncate">' + item.name + '</span></div><i class="fa-solid fa-hand-pointer text-[11px] text-cyan-400/80"></i>';
+
+                card.onclick = (e) => {
+                    e.stopPropagation();
+                    selectCardToAssign(item, card);
+                };
+
+                card.ondragstart = (e) => {
+                    e.dataTransfer.setData('text/plain', JSON.stringify(item));
+                    card.classList.add('opacity-50');
+                };
+                card.ondragend = () => card.classList.remove('opacity-50');
+
+                pool.appendChild(card);
+            });
+
+            setupDropZones();
+        }
+
+        function setupDropZones() {
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.ondragover = (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                };
+                zone.ondragleave = () => zone.classList.remove('drag-over');
+                zone.ondrop = (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    const rawData = e.dataTransfer.getData('text/plain');
+                    if (!rawData) return;
+                    const item = JSON.parse(rawData);
+                    handleCardDrop(item, zone);
+                };
+                zone.onclick = (e) => {
+                    if (selectedGameCard) {
+                        e.stopPropagation();
+                        handleCardDrop(selectedGameCard.item, zone, selectedGameCard.elem);
+                    } else {
+                        showToast('แตะเลือกการ์ดทางซ้ายมือก่อนครับ');
+                    }
+                };
+            });
+        }
+
+        function selectCardToAssign(item, cardElem) {
+            document.querySelectorAll('.drag-card').forEach(c => c.classList.remove('card-selected'));
+            if (selectedGameCard && selectedGameCard.item.id === item.id) {
+                selectedGameCard = null;
+                return;
+            }
+            selectedGameCard = { item, elem: cardElem };
+            cardElem.classList.add('card-selected');
+            playChimeSound(true);
+            showToast('เลือก "' + item.name + '" แล้ว -> แตะกล่องเป้าหมาย');
+        }
+
+        function handleCardDrop(item, zoneElem, cardElemOptional) {
+            const expectedLayer = zoneElem.dataset.layer;
+            const cardElem = cardElemOptional || document.getElementById(item.id);
+
+            if (item.target === expectedLayer) {
+                gameScore += 100;
+                gameMatchedCount++;
+                document.getElementById('game-score').innerText = gameScore;
+                document.getElementById('match-status').innerText = 'จับคู่สำเร็จ ' + gameMatchedCount + ' / 8 ชิ้น';
+                document.getElementById('cards-remaining').innerText = gameCardItems.length - gameMatchedCount;
+
+                const badge = document.createElement('div');
+                badge.className = "px-2 py-1 bg-emerald-950 border border-emerald-500/60 text-emerald-300 rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow";
+                badge.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> <span>' + item.name + '</span>';
+                zoneElem.querySelector('.zone-content').appendChild(badge);
+
+                if (cardElem) cardElem.remove();
+                selectedGameCard = null;
+
+                playChimeSound(true);
+
+                if (gameMatchedCount === gameCardItems.length) {
+                    clearInterval(gameTimerInterval);
+                    if (typeof confetti === 'function') {
+                        confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+                    }
+                    showToast("🎉 ยอดเยี่ยมมาก! คุณจัดหมวดหมู่ครบ 8 การ์ดถูกต้อง 100%");
+                }
+            } else {
+                gameScore = Math.max(0, gameScore - 20);
+                document.getElementById('game-score').innerText = gameScore;
+                zoneElem.classList.add('border-rose-500', 'bg-rose-950/40');
+                setTimeout(() => zoneElem.classList.remove('border-rose-500', 'bg-rose-950/40'), 600);
+                playChimeSound(false);
+                showToast("❌ ยังไม่ตรงหมวดหมู่ ลองดูคำใบ้หรือลองใหม่อีกครั้งครับ!");
+            }
+        }
+
+        function giveGameHint() {
+            const remaining = Array.from(document.querySelectorAll('.drag-card'));
+            if (remaining.length === 0) {
+                showToast('คุณจัดหมวดหมู่การ์ดครบทุกใบแล้ว!');
+                return;
+            }
+            const firstCardId = remaining[0].dataset.id;
+            const item = gameCardItems.find(i => i.id === firstCardId);
+            if (item) {
+                showToast('💡 คำใบ้: ' + item.name + ' -> ' + item.hint);
+                playChimeSound(true);
+            }
+        }
+
+        function resetGame() {
+            initGame();
+            showToast("เริ่มเกมใหม่เรียบร้อย!");
+        }
+
+        function copyCurrentLink(btnElem) {
+            const url = window.location.href;
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(() => {
+                    handleCopySuccess(btnElem);
+                }).catch(() => fallbackCopy(url, btnElem));
+            } else {
+                fallbackCopy(url, btnElem);
+            }
+        }
+
+        function fallbackCopy(text, btnElem) {
+            const temp = document.createElement('textarea');
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            handleCopySuccess(btnElem);
+        }
+
+        function handleCopySuccess(btnElem) {
+            showToast('คัดลอกลิงก์ชิ้นที่ 3 สำเร็จ!');
+            playChimeSound(true);
+            if (btnElem) {
+                const originalText = btnElem.innerHTML;
+                btnElem.innerHTML = '<i class="fa-solid fa-check text-emerald-300"></i> สำเร็จ!';
+                btnElem.classList.add('bg-emerald-600');
+                setTimeout(() => {
+                    btnElem.innerHTML = originalText;
+                    btnElem.classList.remove('bg-emerald-600');
+                }, 2000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initGame();
+        });
+    </script>
+</body>
+</html>
