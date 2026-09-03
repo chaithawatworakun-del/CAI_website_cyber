@@ -602,9 +602,9 @@
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed top-6 right-4 z-50 bg-slate-900 border-2 border-amber-400 text-white px-4 py-2.5 rounded-2xl shadow-2xl text-xs flex items-center gap-2 transform translate-y-[-150%] transition-transform duration-300 pointer-events-none">
+    <div id="toast" style="display: none;" class="fixed top-6 right-4 z-50 bg-slate-900 border-2 border-amber-400 text-white px-4 py-2.5 rounded-2xl shadow-2xl text-xs flex items-center gap-2 pointer-events-none transition-all">
         <i class="fa-solid fa-circle-check text-amber-400 text-base"></i>
-        <span id="toast-message">คัดลอกลิงก์สำเร็จ!</span>
+        <span id="toast-message"></span>
     </div>
 
     <script>
@@ -1226,11 +1226,12 @@
         let toastTimeout = null;
         function showToast(msg) {
             const toast = document.getElementById('toast');
+            if (!toast) return;
             document.getElementById('toast-message').innerText = msg;
-            toast.classList.remove('translate-y-[-150%]');
+            toast.style.display = 'flex';
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => {
-                toast.classList.add('translate-y-[-150%]');
+                toast.style.display = 'none';
             }, 2500);
         }
 
@@ -1490,7 +1491,6 @@
         }
 
         function handleCopySuccess(btnElem) {
-            showToast('คัดลอกลิงก์ชิ้นที่ 2 สำเร็จ!');
             playChimeSound(true);
             if (btnElem) {
                 const originalText = btnElem.innerHTML;

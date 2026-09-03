@@ -100,12 +100,7 @@
                 </a>
             </nav>
 
-            <div class="flex items-center space-x-2">
-                <a href="#toolbox" class="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold px-3.5 py-2 rounded-full transition-all border border-cyan-400/40 shadow flex items-center gap-1.5">
-                    <i class="fa-solid fa-share-nodes text-cyan-200"></i>
-                    <span>ส่งงาน Padlet</span>
-                </a>
-            </div>
+
         </div>
     </header>
 
@@ -423,12 +418,6 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed top-20 right-4 z-50 bg-slate-900 border-2 border-cyan-400 text-white px-4 py-2.5 rounded-2xl shadow-2xl text-xs flex items-center gap-2 transform translate-y-[-150%] transition-transform duration-300 pointer-events-none">
-        <i class="fa-solid fa-circle-check text-cyan-400 text-base"></i>
-        <span id="toast-message">คัดลอกลิงก์สำเร็จ!</span>
-    </div>
-
     <script>
         const sidebar = document.getElementById('sidebar');
         const backdrop = document.getElementById('sidebar-backdrop');
@@ -442,24 +431,13 @@
             }
         }
 
-        let toastTimeout = null;
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-message').innerText = msg;
-            toast.classList.remove('translate-y-[-150%]');
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => {
-                toast.classList.add('translate-y-[-150%]');
-            }, 2500);
-        }
-
         function copyPieceLink(filename, btnElem) {
             const basePath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
             const fullUrl = basePath + filename;
 
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(fullUrl).then(() => {
-                    handleCopySuccess(btnElem, 'คัดลอกลิงก์ ' + filename + ' สำเร็จ!');
+                    handleCopySuccess(btnElem);
                 }).catch(() => fallbackCopy(fullUrl, btnElem));
             } else {
                 fallbackCopy(fullUrl, btnElem);
@@ -473,11 +451,10 @@
             temp.select();
             document.execCommand('copy');
             document.body.removeChild(temp);
-            handleCopySuccess(btnElem, 'คัดลอกลิงก์สำเร็จ!');
+            handleCopySuccess(btnElem);
         }
 
-        function handleCopySuccess(btnElem, msg) {
-            showToast(msg);
+        function handleCopySuccess(btnElem) {
             if (btnElem) {
                 const originalText = btnElem.innerHTML;
                 btnElem.innerHTML = '<i class="fa-solid fa-check text-emerald-300"></i> สำเร็จ!';
