@@ -130,6 +130,16 @@
             background: rgba(255, 255, 255, 0.15);
             cursor: pointer;
         }
+
+        #video-checkpoint-modal::-webkit-scrollbar,
+        #cp-modal-card::-webkit-scrollbar {
+            width: 4px;
+        }
+        #video-checkpoint-modal::-webkit-scrollbar-thumb,
+        #cp-modal-card::-webkit-scrollbar-thumb {
+            background: rgba(245, 158, 11, 0.5);
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 antialiased min-h-screen p-3 sm:p-6 bg-grid-cyber flex flex-col justify-between">
@@ -411,24 +421,25 @@
                     </div>
 
                     <!-- Overlay Checkpoint Modal (Appears over active video) -->
-                    <div id="video-checkpoint-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md p-4 sm:p-6 flex flex-col justify-center items-center text-center hidden z-40 transition-all">
-                        <div class="max-w-md w-full bg-slate-900 p-5 sm:p-6 rounded-3xl border-2 border-amber-400 shadow-2xl space-y-4">
+                    <div id="video-checkpoint-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md p-2 sm:p-4 flex flex-col justify-center items-center text-center hidden z-40 overflow-y-auto transition-all">
+                        <div id="cp-modal-card" class="max-w-md w-full bg-slate-900/98 p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl border-2 border-amber-400 shadow-2xl space-y-2 sm:space-y-2.5 my-auto max-h-full overflow-y-auto">
                             <div class="flex items-center justify-between">
-                                <span id="cp-modal-badge" class="text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40 px-3 py-1 rounded-full uppercase">
+                                <span id="cp-modal-badge" class="text-[11px] sm:text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40 px-2.5 py-0.5 rounded-full uppercase">
                                     <i class="fa-solid fa-flag-checkered mr-1"></i> Checkpoint 1
                                 </span>
                                 <span class="text-xs text-slate-400 font-mono"><i class="fa-solid fa-clock mr-1"></i> <span id="cp-modal-time">0:45</span></span>
                             </div>
 
-                            <h4 id="cp-modal-question" class="text-sm sm:text-base font-bold text-white text-left">
+                            <h4 id="cp-modal-question" class="text-xs sm:text-sm font-bold text-white text-left leading-snug">
                                 การปอกเปลือกนอกของสาย UTP ควรปอกลึกประมาณกี่เซนติเมตร?
                             </h4>
 
-                            <div id="cp-modal-options" class="space-y-2 text-xs text-left"></div>
-                            <div id="cp-modal-feedback" class="p-3 rounded-xl text-xs text-left hidden"></div>
+                            <div id="cp-modal-options" class="space-y-1.5 text-xs text-left"></div>
+                            <div id="cp-modal-feedback" class="p-2 sm:p-2.5 rounded-xl text-[11px] sm:text-xs text-left hidden leading-relaxed"></div>
 
-                            <button id="cp-modal-continue-btn" onclick="resumeVideoAfterCheckpoint()" class="w-full bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 text-white font-bold py-2.5 rounded-xl transition-all shadow-md hidden active:scale-95">
-                                <i class="fa-solid fa-circle-check mr-1"></i> รับทราบแล้ว ดูคลิปต่อ
+                            <button id="cp-modal-continue-btn" onclick="resumeVideoAfterCheckpoint()" class="w-full bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 text-white font-bold py-2 sm:py-2.5 rounded-xl transition-all shadow-md hidden active:scale-95 text-xs sm:text-sm flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span>รับทราบแล้ว ดูคลิปต่อ</span>
                             </button>
                         </div>
                     </div>
@@ -1281,13 +1292,13 @@
 
             data.options.forEach((opt, idx) => {
                 const btn = document.createElement('button');
-                btn.className = "w-full p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left transition-all flex items-center justify-between text-slate-200 cursor-pointer";
-                btn.innerHTML = '<span>' + opt.text + '</span> <i class="fa-regular fa-circle text-slate-500"></i>';
+                btn.className = "w-full p-2 sm:p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left transition-all flex items-center justify-between text-slate-200 cursor-pointer text-xs";
+                btn.innerHTML = '<span>' + opt.text + '</span> <i class="fa-regular fa-circle text-slate-500 shrink-0 ml-2"></i>';
                 btn.onclick = () => selectCPOption(cpId, idx, opt.correct, data.explanation, btn);
                 optContainer.appendChild(btn);
             });
 
-            document.getElementById('cp-modal-feedback').className = "p-3 rounded-xl text-xs text-left hidden";
+            document.getElementById('cp-modal-feedback').className = "p-2 sm:p-2.5 rounded-xl text-[11px] sm:text-xs text-left hidden leading-relaxed";
             document.getElementById('cp-modal-continue-btn').classList.add('hidden');
             document.getElementById('video-checkpoint-modal').classList.remove('hidden');
             playChimeSound(true);
@@ -1299,15 +1310,17 @@
 
             document.querySelectorAll('#cp-modal-options button').forEach(b => {
                 b.disabled = true;
-                b.classList.add('opacity-60');
+                if (b !== btnElem) {
+                    b.classList.add('opacity-40', 'py-1.5', 'text-[11px]');
+                }
             });
 
-            btnElem.classList.remove('opacity-60');
+            btnElem.classList.remove('opacity-60', 'opacity-40');
             if (isCorrect) {
                 btnElem.classList.add('bg-emerald-950', 'border-emerald-500', 'text-emerald-300');
-                btnElem.querySelector('i').className = "fa-solid fa-circle-check text-emerald-400";
-                feedback.className = "p-3 rounded-xl text-xs text-left bg-emerald-950/90 border border-emerald-500 text-emerald-200";
-                feedback.innerHTML = '<strong class="text-white block mb-1">🎉 ถูกต้องยอดเยี่ยม!</strong> ' + explanation;
+                btnElem.querySelector('i').className = "fa-solid fa-circle-check text-emerald-400 shrink-0 ml-2";
+                feedback.className = "p-2 sm:p-2.5 rounded-xl text-[11px] sm:text-xs text-left bg-emerald-950/90 border border-emerald-500 text-emerald-200 leading-relaxed";
+                feedback.innerHTML = '<strong class="text-white block mb-0.5">🎉 ถูกต้องยอดเยี่ยม!</strong> ' + explanation;
 
                 if (!answeredCP[cpId]) {
                     videoScore++;
@@ -1319,15 +1332,18 @@
                 speakSingleLine("ยอดเยี่ยมมากครับ คำตอบถูกต้อง");
             } else {
                 btnElem.classList.add('bg-rose-950', 'border-rose-500', 'text-rose-300');
-                btnElem.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-400";
-                feedback.className = "p-3 rounded-xl text-xs text-left bg-rose-950/90 border border-rose-500 text-rose-200";
-                feedback.innerHTML = '<strong class="text-white block mb-1">❌ ยังไม่ถูกต้อง</strong> ' + explanation;
+                btnElem.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-400 shrink-0 ml-2";
+                feedback.className = "p-2 sm:p-2.5 rounded-xl text-[11px] sm:text-xs text-left bg-rose-950/90 border border-rose-500 text-rose-200 leading-relaxed";
+                feedback.innerHTML = '<strong class="text-white block mb-0.5">❌ ยังไม่ถูกต้อง</strong> ' + explanation;
                 playChimeSound(false);
                 speakSingleLine("ยังไม่ถูกต้องครับ ลองศึกษาทบทวนดูนะครับ");
             }
 
             feedback.classList.remove('hidden');
             contBtn.classList.remove('hidden');
+            setTimeout(() => {
+                contBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 60);
         }
 
         function speakSingleLine(text) {
