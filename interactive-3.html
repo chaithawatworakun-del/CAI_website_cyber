@@ -111,14 +111,14 @@
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-800 text-xs">
             <div class="flex items-center gap-2 text-slate-300">
                 <i class="fa-solid fa-circle-info text-emerald-400"></i>
-                <span>วิธีเล่น: <strong class="text-cyan-300">แตะเลือกการ์ด</strong> ทางซ้าย แล้วแตะลงในกล่องเป้าหมาย (หรือลาก-วาง)</span>
+                <span>วิธีเล่น: <strong class="text-cyan-300">ลากหรือแตะการ์ด</strong> ไปจัดวางในโซนเป้าหมายให้ครบ แล้วกดปุ่ม <strong class="text-emerald-300">"ตรวจคำตอบ"</strong></span>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="giveGameHint()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-bold transition-all flex items-center gap-1">
-                    <i class="fa-solid fa-lightbulb"></i> ขอคำใบ้
-                </button>
-                <button onclick="resetGame()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-semibold hover:text-white transition-all flex items-center gap-1">
+                <button onclick="resetGame()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-semibold hover:text-white transition-all flex items-center gap-1 active:scale-95">
                     <i class="fa-solid fa-rotate-right"></i> เริ่มใหม่
+                </button>
+                <button id="check-answers-btn" onclick="checkAnswers()" class="bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold px-4 py-1.5 rounded-xl shadow-md transition-all flex items-center gap-1.5 active:scale-95 text-xs">
+                    <i class="fa-solid fa-circle-check"></i> ตรวจคำตอบ
                 </button>
             </div>
         </div>
@@ -199,6 +199,18 @@
                     </div>
 
                 </div>
+                
+                <!-- Bottom Action Check Bar -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-800">
+                    <span class="text-[11px] text-slate-400">
+                        <i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i> วางผิดก็ไม่เป็นไร! กด <i class="fa-solid fa-xmark text-rose-400"></i> บนการ์ดเพื่อนำกลับมาเลือกใหม่ได้
+                    </span>
+                    <button id="check-answers-bottom-btn" onclick="checkAnswers()" class="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold px-5 py-2 rounded-xl shadow-lg shadow-emerald-500/20 text-xs transition-all flex items-center justify-center gap-2 active:scale-95">
+                        <i class="fa-solid fa-circle-check text-sm"></i>
+                        <span>ตรวจสอบคำตอบ</span>
+                    </button>
+                </div>
+
             </div>
 
         </div>
@@ -217,6 +229,66 @@
     <!-- Mini Bottom Copyright -->
     <div class="max-w-6xl w-full mx-auto mt-4 text-center text-[10px] text-slate-500">
         © 2026 Interactive Learning Lab • พัฒนาโดย ครูชัยธวัฒน์ ศรีแสนวรกุล (ครูไนท์)
+    </div>
+
+    <!-- Result Score Modal -->
+    <div id="score-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden items-center justify-center p-4 transition-all duration-300">
+        <div class="max-w-md w-full bg-slate-900 border-2 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-5 relative transform transition-all" id="modal-card">
+            
+            <button onclick="closeScoreModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors" title="ปิดหน้าต่างเพื่อดูเฉลยบนกระดาน">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Icon Graphic -->
+            <div class="flex justify-center pt-2">
+                <div id="modal-icon-wrap" class="w-20 h-20 rounded-full flex items-center justify-center text-4xl shadow-2xl border-2 border-slate-700 bg-slate-950">
+                    <i id="modal-icon" class="fa-solid fa-trophy text-amber-400"></i>
+                </div>
+            </div>
+
+            <!-- Title & Encouragement -->
+            <div class="space-y-1.5">
+                <h3 id="modal-title" class="text-xl sm:text-2xl font-black text-white"></h3>
+                <p id="modal-encouragement" class="text-xs sm:text-sm text-slate-300 leading-relaxed px-2"></p>
+            </div>
+
+            <!-- Score Summary Card -->
+            <div class="p-4 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3 text-center">
+                <div class="space-y-0.5">
+                    <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">คะแนนที่ได้</p>
+                    <p id="modal-score-num" class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300">0 / 8</p>
+                    <p id="modal-score-pts" class="text-xs font-bold text-emerald-400 font-mono">0 คะแนน</p>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-xs pt-3 border-t border-slate-800/80">
+                    <div class="bg-emerald-950/50 border border-emerald-500/30 rounded-xl p-2.5">
+                        <p class="text-[10px] text-slate-400 font-medium">ถูกต้อง</p>
+                        <p id="modal-correct-count" class="font-black text-emerald-400 text-base">0 ข้อ</p>
+                    </div>
+                    <div class="bg-rose-950/50 border border-rose-500/30 rounded-xl p-2.5">
+                        <p class="text-[10px] text-slate-400 font-medium">ต้องทบทวน</p>
+                        <p id="modal-incorrect-count" class="font-black text-rose-400 text-base">0 ข้อ</p>
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-400 flex items-center justify-center gap-1.5 pt-1">
+                    <i class="fa-regular fa-clock text-cyan-400"></i> เวลาที่ใช้: <span id="modal-time-used" class="text-slate-200 font-mono font-bold">00:00</span> นาที
+                </p>
+            </div>
+
+            <!-- Action Buttons: ทำใหม่ & ต่อไป -->
+            <div class="flex items-center gap-3 pt-2">
+                <button onclick="resetGame()" class="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs sm:text-sm border border-slate-700 transition-all flex items-center justify-center gap-2 active:scale-95 shadow">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>ทำใหม่</span>
+                </button>
+                <a href="interactive.html#toolbox" target="_top" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 active:scale-95">
+                    <span>ต่อไป</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <p class="text-[10px] text-slate-500">สามารถกดปุ่ม ✕ เพื่อดูเฉลยของแต่ละการ์ดบนหน้าจอได้</p>
+
+        </div>
     </div>
 
     <!-- Toast Notification -->
@@ -268,30 +340,52 @@
         }
 
         const gameCardItems = [
-            { id: 'c1', name: 'HTTP / HTTPS (Web Data)', target: 'application', icon: 'fa-globe', color: 'text-cyan-400', hint: 'โพรโทคอลเว็บ ทำงานที่ Layer 7 (Application)' },
-            { id: 'c2', name: 'DNS Server (Name Resolve)', target: 'application', icon: 'fa-server', color: 'text-cyan-400', hint: 'บริการแปลงชื่อโดเมนเป็น IP อยู่ที่ Layer 7 (Application)' },
-            { id: 'c3', name: 'TCP 3-Way Handshake', target: 'transport', icon: 'fa-handshake', color: 'text-blue-400', hint: 'โพรโทคอลควบคุมการส่งข้อมูลที่น่าเชื่อถือ อยู่ที่ Layer 4 (Transport)' },
-            { id: 'c4', name: 'UDP Protocol (Streaming)', target: 'transport', icon: 'fa-bolt', color: 'text-blue-400', hint: 'โพรโทคอลส่งเร็วไม่รอตอบรับ อยู่ที่ Layer 4 (Transport)' },
-            { id: 'c5', name: 'IP Address & Core Router', target: 'network', icon: 'fa-route', color: 'text-emerald-400', hint: 'ที่อยู่เชิงตรรกะและการหาเส้นทาง อยู่ที่ Layer 3 (Network)' },
-            { id: 'c6', name: 'MAC Address & Switch', target: 'datalink', icon: 'fa-microchip', color: 'text-amber-400', hint: 'ที่อยู่ฮาร์ดแวร์และการส่ง Frame อยู่ที่ Layer 2 (Data Link)' },
-            { id: 'c7', name: 'Cat 6A UTP Cable & Bits', target: 'physical', icon: 'fa-ethernet', color: 'text-orange-400', hint: 'สายเคเบิลทองแดงและสัญญาณไฟฟ้า อยู่ที่ Layer 1 (Physical)' },
-            { id: 'c8', name: 'Hardware Firewall & MFA', target: 'security', icon: 'fa-shield-halved', color: 'text-rose-400', hint: 'ระบบเกราะป้องกันและไฟร์วอลล์ อยู่ในหมวด Cyber Defense' }
+            { id: 'c1', name: 'HTTP / HTTPS (Web Data)', target: 'application', icon: 'fa-globe', color: 'text-cyan-400' },
+            { id: 'c2', name: 'DNS Server (Name Resolve)', target: 'application', icon: 'fa-server', color: 'text-cyan-400' },
+            { id: 'c3', name: 'TCP 3-Way Handshake', target: 'transport', icon: 'fa-handshake', color: 'text-blue-400' },
+            { id: 'c4', name: 'UDP Protocol (Streaming)', target: 'transport', icon: 'fa-bolt', color: 'text-blue-400' },
+            { id: 'c5', name: 'IP Address & Core Router', target: 'network', icon: 'fa-route', color: 'text-emerald-400' },
+            { id: 'c6', name: 'MAC Address & Switch', target: 'datalink', icon: 'fa-microchip', color: 'text-amber-400' },
+            { id: 'c7', name: 'Cat 6A UTP Cable & Bits', target: 'physical', icon: 'fa-ethernet', color: 'text-orange-400' },
+            { id: 'c8', name: 'Hardware Firewall & MFA', target: 'security', icon: 'fa-shield-halved', color: 'text-rose-400' }
         ];
 
         let selectedGameCard = null;
         let gameScore = 0;
-        let gameMatchedCount = 0;
         let gameSeconds = 0;
         let gameTimerInterval = null;
+        let placedCards = {}; // cardId -> { item, placedZone }
+        let hasCheckedAnswers = false;
+
+        function getLayerDisplayName(layerKey) {
+            switch (layerKey) {
+                case 'application': return 'Layer 7: Application';
+                case 'transport': return 'Layer 4: Transport';
+                case 'network': return 'Layer 3: Network';
+                case 'datalink': return 'Layer 2: Data Link';
+                case 'physical': return 'Layer 1: Physical';
+                case 'security': return 'Cyber Defense';
+                default: return layerKey;
+            }
+        }
 
         function initGame() {
             gameScore = 0;
-            gameMatchedCount = 0;
             gameSeconds = 0;
             selectedGameCard = null;
+            placedCards = {};
+            hasCheckedAnswers = false;
+
             document.getElementById('game-score').innerText = '0';
-            document.getElementById('match-status').innerText = 'จับคู่สำเร็จ 0 / 8 ชิ้น';
+            document.getElementById('match-status').innerText = 'จัดวางแล้ว 0 / 8 ชิ้น';
             document.getElementById('cards-remaining').innerText = gameCardItems.length;
+
+            closeScoreModal();
+
+            const checkBtnTop = document.getElementById('check-answers-btn');
+            const checkBtnBottom = document.getElementById('check-answers-bottom-btn');
+            if (checkBtnTop) checkBtnTop.classList.remove('ring-2', 'ring-emerald-400', 'animate-pulse');
+            if (checkBtnBottom) checkBtnBottom.classList.remove('ring-2', 'ring-emerald-400', 'animate-pulse');
 
             clearInterval(gameTimerInterval);
             gameTimerInterval = setInterval(() => {
@@ -308,30 +402,35 @@
 
             const shuffled = [...gameCardItems].sort(() => Math.random() - 0.5);
             shuffled.forEach(item => {
-                const card = document.createElement('div');
-                card.id = item.id;
-                card.className = "drag-card p-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-xs text-slate-200 font-medium flex items-center justify-between gap-2 shadow cursor-pointer transition-all";
-                card.draggable = true;
-                card.dataset.target = item.target;
-                card.dataset.id = item.id;
-
-                card.innerHTML = '<div class="flex items-center gap-2 truncate"><i class="fa-solid ' + item.icon + ' ' + item.color + ' text-sm"></i><span class="truncate">' + item.name + '</span></div><i class="fa-solid fa-hand-pointer text-[11px] text-cyan-400/80"></i>';
-
-                card.onclick = (e) => {
-                    e.stopPropagation();
-                    selectCardToAssign(item, card);
-                };
-
-                card.ondragstart = (e) => {
-                    e.dataTransfer.setData('text/plain', JSON.stringify(item));
-                    card.classList.add('opacity-50');
-                };
-                card.ondragend = () => card.classList.remove('opacity-50');
-
-                pool.appendChild(card);
+                renderCardInPool(item);
             });
 
             setupDropZones();
+        }
+
+        function renderCardInPool(item) {
+            const pool = document.getElementById('game-cards-pool');
+            const card = document.createElement('div');
+            card.id = item.id;
+            card.className = "drag-card p-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-xs text-slate-200 font-medium flex items-center justify-between gap-2 shadow cursor-pointer transition-all";
+            card.draggable = true;
+            card.dataset.target = item.target;
+            card.dataset.id = item.id;
+
+            card.innerHTML = '<div class="flex items-center gap-2 truncate"><i class="fa-solid ' + item.icon + ' ' + item.color + ' text-sm"></i><span class="truncate">' + item.name + '</span></div><i class="fa-solid fa-hand-pointer text-[11px] text-cyan-400/80"></i>';
+
+            card.onclick = (e) => {
+                e.stopPropagation();
+                selectCardToAssign(item, card);
+            };
+
+            card.ondragstart = (e) => {
+                e.dataTransfer.setData('text/plain', JSON.stringify(item));
+                card.classList.add('opacity-50');
+            };
+            card.ondragend = () => card.classList.remove('opacity-50');
+
+            pool.appendChild(card);
         }
 
         function setupDropZones() {
@@ -347,17 +446,25 @@
                     const rawData = e.dataTransfer.getData('text/plain');
                     if (!rawData) return;
                     const item = JSON.parse(rawData);
-                    handleCardDrop(item, zone);
+                    handleCardPlacement(item, zone);
                 };
                 zone.onclick = (e) => {
                     if (selectedGameCard) {
                         e.stopPropagation();
-                        handleCardDrop(selectedGameCard.item, zone, selectedGameCard.elem);
-                    } else {
-                        showToast('แตะเลือกการ์ดทางซ้ายมือก่อนครับ');
+                        handleCardPlacement(selectedGameCard.item, zone);
                     }
                 };
             });
+
+            const pool = document.getElementById('game-cards-pool');
+            pool.ondragover = (e) => e.preventDefault();
+            pool.ondrop = (e) => {
+                e.preventDefault();
+                const rawData = e.dataTransfer.getData('text/plain');
+                if (!rawData) return;
+                const item = JSON.parse(rawData);
+                returnCardToPool(item.id);
+            };
         }
 
         function selectCardToAssign(item, cardElem) {
@@ -369,64 +476,202 @@
             selectedGameCard = { item, elem: cardElem };
             cardElem.classList.add('card-selected');
             playChimeSound(true);
-            showToast('เลือก "' + item.name + '" แล้ว -> แตะกล่องเป้าหมาย');
         }
 
-        function handleCardDrop(item, zoneElem, cardElemOptional) {
-            const expectedLayer = zoneElem.dataset.layer;
-            const cardElem = cardElemOptional || document.getElementById(item.id);
+        function handleCardPlacement(item, zoneElem) {
+            const targetZoneKey = zoneElem.dataset.layer;
 
-            if (item.target === expectedLayer) {
-                gameScore += 100;
-                gameMatchedCount++;
-                document.getElementById('game-score').innerText = gameScore;
-                document.getElementById('match-status').innerText = 'จับคู่สำเร็จ ' + gameMatchedCount + ' / 8 ชิ้น';
-                document.getElementById('cards-remaining').innerText = gameCardItems.length - gameMatchedCount;
+            // If card was already in another zone, remove old badge
+            const oldBadge = document.getElementById('placed-' + item.id);
+            if (oldBadge) oldBadge.remove();
 
-                const badge = document.createElement('div');
-                badge.className = "px-2 py-1 bg-emerald-950 border border-emerald-500/60 text-emerald-300 rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow";
-                badge.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> <span>' + item.name + '</span>';
-                zoneElem.querySelector('.zone-content').appendChild(badge);
+            // If it was in pool, remove element from pool
+            const poolCard = document.getElementById(item.id);
+            if (poolCard) poolCard.remove();
 
-                if (cardElem) cardElem.remove();
-                selectedGameCard = null;
+            // Record placement
+            placedCards[item.id] = { item, placedZone: targetZoneKey };
+            selectedGameCard = null;
 
-                playChimeSound(true);
+            // Render placed badge inside zone
+            const badge = document.createElement('div');
+            badge.id = 'placed-' + item.id;
+            badge.className = "placed-card px-2.5 py-1.5 bg-slate-800 border border-slate-700 hover:border-cyan-400 text-slate-200 rounded-xl text-xs font-medium flex items-center justify-between gap-1.5 shadow transition-all cursor-grab";
+            badge.draggable = true;
 
-                if (gameMatchedCount === gameCardItems.length) {
-                    clearInterval(gameTimerInterval);
-                    if (typeof confetti === 'function') {
-                        confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
-                    }
-                    showToast("🎉 ยอดเยี่ยมมาก! คุณจัดหมวดหมู่ครบ 8 การ์ดถูกต้อง 100%");
-                }
+            badge.innerHTML = `
+                <div class="flex items-center gap-1.5 truncate">
+                    <i class="fa-solid ${item.icon} ${item.color} text-xs"></i>
+                    <span class="truncate">${item.name}</span>
+                </div>
+                <button onclick="returnCardToPool('${item.id}', event)" class="text-slate-400 hover:text-rose-400 p-0.5 rounded transition-colors" title="นำการ์ดกลับไปเลือกใหม่">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            `;
+
+            badge.ondragstart = (e) => {
+                e.dataTransfer.setData('text/plain', JSON.stringify(item));
+                badge.classList.add('opacity-50');
+            };
+            badge.ondragend = () => badge.classList.remove('opacity-50');
+
+            zoneElem.querySelector('.zone-content').appendChild(badge);
+            playChimeSound(true);
+
+            updateCounters();
+        }
+
+        function returnCardToPool(itemId, event) {
+            if (event) event.stopPropagation();
+
+            const record = placedCards[itemId];
+            if (!record) return;
+
+            const badge = document.getElementById('placed-' + itemId);
+            if (badge) badge.remove();
+
+            delete placedCards[itemId];
+            renderCardInPool(record.item);
+            playChimeSound(false);
+
+            updateCounters();
+        }
+
+        function updateCounters() {
+            const placedCount = Object.keys(placedCards).length;
+            const remainingCount = gameCardItems.length - placedCount;
+
+            document.getElementById('cards-remaining').innerText = remainingCount;
+            document.getElementById('match-status').innerText = 'จัดวางแล้ว ' + placedCount + ' / 8 ชิ้น';
+
+            const checkBtnTop = document.getElementById('check-answers-btn');
+            const checkBtnBottom = document.getElementById('check-answers-bottom-btn');
+
+            if (placedCount === gameCardItems.length) {
+                if (checkBtnTop) checkBtnTop.classList.add('ring-2', 'ring-emerald-400', 'animate-pulse');
+                if (checkBtnBottom) checkBtnBottom.classList.add('ring-2', 'ring-emerald-400', 'animate-pulse');
             } else {
-                gameScore = Math.max(0, gameScore - 20);
-                document.getElementById('game-score').innerText = gameScore;
-                zoneElem.classList.add('border-rose-500', 'bg-rose-950/40');
-                setTimeout(() => zoneElem.classList.remove('border-rose-500', 'bg-rose-950/40'), 600);
-                playChimeSound(false);
-                showToast("❌ ยังไม่ตรงหมวดหมู่ ลองดูคำใบ้หรือลองใหม่อีกครั้งครับ!");
+                if (checkBtnTop) checkBtnTop.classList.remove('ring-2', 'ring-emerald-400', 'animate-pulse');
+                if (checkBtnBottom) checkBtnBottom.classList.remove('ring-2', 'ring-emerald-400', 'animate-pulse');
             }
         }
 
-        function giveGameHint() {
-            const remaining = Array.from(document.querySelectorAll('.drag-card'));
-            if (remaining.length === 0) {
-                showToast('คุณจัดหมวดหมู่การ์ดครบทุกใบแล้ว!');
+        function checkAnswers() {
+            const placedKeys = Object.keys(placedCards);
+            if (placedKeys.length === 0) {
+                showToast('กรุณาลากหรือแตะการ์ดไปวางในโซนเป้าหมายก่อนครับ');
                 return;
             }
-            const firstCardId = remaining[0].dataset.id;
-            const item = gameCardItems.find(i => i.id === firstCardId);
-            if (item) {
-                showToast('💡 คำใบ้: ' + item.name + ' -> ' + item.hint);
-                playChimeSound(true);
+
+            clearInterval(gameTimerInterval);
+            hasCheckedAnswers = true;
+
+            let correctCount = 0;
+
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                const zoneLayer = zone.dataset.layer;
+                const contentDiv = zone.querySelector('.zone-content');
+                contentDiv.innerHTML = '';
+
+                const inThisZone = Object.values(placedCards).filter(c => c.placedZone === zoneLayer);
+                inThisZone.forEach(c => {
+                    const isCorrect = (c.item.target === zoneLayer);
+                    if (isCorrect) correctCount++;
+
+                    const badge = document.createElement('div');
+                    badge.className = isCorrect
+                        ? "px-2.5 py-1.5 bg-emerald-950/90 border border-emerald-400 text-emerald-300 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow"
+                        : "px-2.5 py-1.5 bg-rose-950/90 border border-rose-500 text-rose-300 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow";
+
+                    badge.innerHTML = isCorrect
+                        ? `<i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i> <span>${c.item.name}</span>`
+                        : `<i class="fa-solid fa-circle-xmark text-rose-400 text-sm"></i> <span>${c.item.name}</span> <span class="text-[10px] text-rose-300 font-normal bg-rose-900/60 px-1.5 py-0.5 rounded ml-1">เฉลย: ${getLayerDisplayName(c.item.target)}</span>`;
+
+                    contentDiv.appendChild(badge);
+                });
+            });
+
+            gameScore = correctCount * 100;
+            document.getElementById('game-score').innerText = gameScore;
+            document.getElementById('match-status').innerText = `ตรวจแล้ว: ถูกต้อง ${correctCount} / 8 ชิ้น`;
+
+            showScoreModal(correctCount);
+        }
+
+        function showScoreModal(correctCount) {
+            const mins = String(Math.floor(gameSeconds / 60)).padStart(2, '0');
+            const secs = String(gameSeconds % 60).padStart(2, '0');
+            const timeStr = mins + ':' + secs;
+
+            let encourageTitle = "";
+            let encourageMsg = "";
+            let iconClass = "";
+            let iconColor = "";
+            let cardBorder = "";
+
+            if (correctCount === 8) {
+                encourageTitle = "🎉 ยอดเยี่ยมที่สุด 100% เต็ม!";
+                encourageMsg = "เก่งมากๆ เลยครับ! ตอบถูกครบทุกข้ออย่างสมบูรณ์แบบ มีความรู้ความเข้าใจเรื่อง OSI Layers และ Cyber Defense ได้ดีเยี่ยม!";
+                iconClass = "fa-solid fa-trophy";
+                iconColor = "text-amber-400 animate-bounce";
+                cardBorder = "border-emerald-500/80";
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 160, spread: 90, origin: { y: 0.6 } });
+                }
+            } else if (correctCount >= 6) {
+                encourageTitle = "👏 เก่งมากครับ! สู้ๆ นะ อีกนิดเดียว";
+                encourageMsg = "ทำคะแนนได้ยอดเยี่ยมมากครับ! ตอบถูกเกือบครบทั้งหมดแล้ว สู้ๆ นะ อีกนิดเดียวเท่านั้นก็จะเต็ม 100% แล้วครับ!";
+                iconClass = "fa-solid fa-medal";
+                iconColor = "text-cyan-400";
+                cardBorder = "border-cyan-500/80";
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+                }
+            } else if (correctCount >= 4) {
+                encourageTitle = "💪 สู้ๆ นะครับ! อีกนิดเดียว";
+                encourageMsg = "ทำได้ดีมากครับ มาเกินครึ่งทางแล้ว สู้ๆ นะ อีกนิดเดียวเท่านั้น! ลองกดทำใหม่อีกครั้งเพื่อทบทวน รับรองได้คะแนนเต็มแน่นอน!";
+                iconClass = "fa-solid fa-star";
+                iconColor = "text-amber-400";
+                cardBorder = "border-amber-500/80";
+            } else {
+                encourageTitle = "✌️ สู้ๆ นะครับ! ไม่เป็นไรนะ";
+                encourageMsg = "ไม่ต้องกังวลนะครับ สู้ๆ นะ! ลองสังเกตคำเฉลยและบทบาทของแต่ละ Layer บนหน้าจอ แล้วกดทำใหม่อีกครั้ง อีกนิดเดียวทำได้แน่นอนครับ!";
+                iconClass = "fa-solid fa-heart";
+                iconColor = "text-rose-400";
+                cardBorder = "border-rose-500/80";
+            }
+
+            document.getElementById('modal-title').innerText = encourageTitle;
+            document.getElementById('modal-encouragement').innerText = encourageMsg;
+            document.getElementById('modal-score-num').innerText = correctCount + ' / 8';
+            document.getElementById('modal-score-pts').innerText = (correctCount * 100) + ' / 800 คะแนน';
+            document.getElementById('modal-correct-count').innerText = correctCount + ' ข้อ';
+            document.getElementById('modal-incorrect-count').innerText = (8 - correctCount) + ' ข้อ';
+            document.getElementById('modal-time-used').innerText = timeStr;
+
+            const iconElem = document.getElementById('modal-icon');
+            iconElem.className = iconClass + ' ' + iconColor;
+
+            const cardElem = document.getElementById('modal-card');
+            cardElem.className = "max-w-md w-full bg-slate-900 border-2 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-5 relative transform transition-all " + cardBorder;
+
+            const modal = document.getElementById('score-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            playChimeSound(correctCount >= 4);
+        }
+
+        function closeScoreModal() {
+            const modal = document.getElementById('score-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
             }
         }
 
         function resetGame() {
             initGame();
-            showToast("เริ่มเกมใหม่เรียบร้อย!");
         }
 
         function copyCurrentLink(btnElem) {
