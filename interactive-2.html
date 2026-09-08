@@ -1364,9 +1364,25 @@
         ];
 
         let placedWires = [];
+        let wirePoolOrder = [];
+
+        function shuffleWirePoolOrder() {
+            // Initial distinct mixed order or Fisher-Yates shuffle
+            wirePoolOrder = [...standardColorsT568B];
+            for (let i = wirePoolOrder.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [wirePoolOrder[i], wirePoolOrder[j]] = [wirePoolOrder[j], wirePoolOrder[i]];
+            }
+            // Ensure not in exact T568B order
+            const isSame = wirePoolOrder.every((w, idx) => w.id === standardColorsT568B[idx].id);
+            if (isSame && wirePoolOrder.length > 1) {
+                [wirePoolOrder[0], wirePoolOrder[1]] = [wirePoolOrder[1], wirePoolOrder[0]];
+            }
+        }
 
         function initWireSimulator() {
             placedWires = [];
+            shuffleWirePoolOrder();
             renderWireSlots();
             renderWirePool();
         }
@@ -1380,9 +1396,11 @@
                 slot.className = "flex flex-col items-center gap-1 p-1 rounded-xl bg-slate-900 border border-slate-800";
                 
                 if (wire) {
-                    slot.innerHTML = '<span class="text-[10px] text-slate-400 font-mono">P' + (i + 1) + '</span><div class="w-full h-12 rounded-lg border-2 ' + wire.border + ' flex items-center justify-center text-[10px] font-bold text-white shadow-inner" style="background-color: ' + wire.code + '">' + wire.name.substring(0, 2) + '</div>';
+                    slot.innerHTML = '<span class="text-[10px] text-slate-400 font-mono">P' + (i + 1) + '</span><div class="w-full h-12 rounded-lg border-2 ' + wire.border + ' flex items-center justify-center text-[10px] font-bold text-white shadow-inner cursor-pointer hover:opacity-80 transition-all select-none" style="background-color: ' + wire.code + '" title="คลิกเพื่อนำสายนี้ออก">' + wire.name.substring(0, 2) + '</div>';
+                    slot.onclick = () => removeWireAt(i);
                 } else {
                     slot.innerHTML = '<span class="text-[10px] text-slate-500 font-mono">P' + (i + 1) + '</span><div class="w-full h-12 rounded-lg border border-dashed border-slate-700 bg-slate-950 flex items-center justify-center text-[10px] text-slate-600">ว่าง</div>';
+                    slot.onclick = null;
                 }
                 container.appendChild(slot);
             }
@@ -1392,10 +1410,13 @@
         function renderWirePool() {
             const pool = document.getElementById('wire-pool-container');
             pool.innerHTML = '';
-            standardColorsT568B.forEach(wire => {
+            if (!wirePoolOrder || wirePoolOrder.length === 0) {
+                shuffleWirePoolOrder();
+            }
+            wirePoolOrder.forEach(wire => {
                 const btn = document.createElement('button');
                 const isUsed = placedWires.some(w => w.id === wire.id);
-                btn.className = 'p-2 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-all ' + (isUsed ? 'opacity-30 pointer-events-none bg-slate-900 border-slate-800' : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-white cursor-pointer');
+                btn.className = 'p-2 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-all ' + (isUsed ? 'opacity-30 pointer-events-none bg-slate-900 border-slate-800' : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-white cursor-pointer active:scale-95');
                 btn.innerHTML = '<span class="w-4 h-4 rounded-full border-2 ' + wire.border + ' shrink-0" style="background-color: ' + wire.code + '"></span><span class="truncate">' + wire.name + '</span>';
                 btn.onclick = () => addWireToSlot(wire);
                 pool.appendChild(btn);
@@ -1413,15 +1434,25 @@
             playChimeSound(true);
         }
 
+        function removeWireAt(idx) {
+            if (idx >= 0 && idx < placedWires.length) {
+                placedWires.splice(idx, 1);
+                renderWireSlots();
+                renderWirePool();
+                playChimeSound(true);
+            }
+        }
+
         function resetWireSimulator() {
             placedWires = [];
+            shuffleWirePoolOrder();
             renderWireSlots();
             renderWirePool();
             for (let i = 1; i <= 8; i++) {
                 const led = document.getElementById('led-' + i);
                 if (led) led.className = "w-3.5 h-3.5 rounded-full bg-slate-800 border border-slate-700 led-dot";
             }
-            showToast('รีเซ็ตสายแลนแล้ว');
+            showToast('รีเซ็ตสายและสลับตำแหน่งปุ่มสีใหม่เรียบร้อย');
         }
 
         function testWireSequence() {

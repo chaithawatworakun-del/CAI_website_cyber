@@ -140,9 +140,9 @@
             <!-- Filter Buttons -->
             <div class="flex flex-wrap items-center gap-1.5">
                 <button onclick="filterHotspots('all', this)" class="hotspot-filter-btn px-3 py-1 rounded-xl bg-cyan-600 text-white font-semibold shadow">ทั้งหมด (6)</button>
-                <button onclick="filterHotspots('routing', this)" class="hotspot-filter-btn px-3 py-1 rounded-xl bg-slate-800 text-slate-300 hover:text-white">Routing & Switch</button>
-                <button onclick="filterHotspots('security', this)" class="hotspot-filter-btn px-3 py-1 rounded-xl bg-slate-800 text-slate-300 hover:text-white">Security</button>
-                <button onclick="filterHotspots('cabling', this)" class="hotspot-filter-btn px-3 py-1 rounded-xl bg-slate-800 text-slate-300 hover:text-white">Cabling & Wi-Fi</button>
+                <button onclick="filterHotspots('routing', this)" class="hotspot-filter-btn px-3 py-1 rounded-xl bg-slate-800 text-slate-300 hover:text-white">Routing & Switch (3)</button>
+                <button onclick="filterHotspots('security', this)" class="hotspot-filter-btn px-3 py-1 rounded-xl bg-slate-800 text-slate-300 hover:text-white">Security & Gateway (2)</button>
+                <button onclick="filterHotspots('wireless', this)" class="hotspot-filter-btn px-3 py-1 rounded-xl bg-slate-800 text-slate-300 hover:text-white">Wireless AP (1)</button>
             </div>
         </div>
 
@@ -180,23 +180,26 @@
             <div class="hotspot-item category-routing top-[6%] left-[4%] sm:top-[8%] sm:left-[8%] z-30" id="hotspot-wrap-1" onmouseenter="playChimeSound(true)">
                 <div class="hotspot-node group relative flex flex-col items-center">
                     <span class="animate-ring absolute inset-0 rounded-full bg-cyan-400"></span>
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-cyan-600 to-sky-400 border-2 border-white text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-xl shadow-cyan-500/60">
-                        <i class="fa-solid fa-route"></i>
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-b from-cyan-950/80 via-slate-900/90 to-slate-950 border-2 border-cyan-400 text-white flex items-center justify-center p-2 shadow-xl shadow-cyan-500/50 backdrop-blur-md">
+                        <img src="image/eq/Router.png" alt="Router" class="w-full h-full object-contain filter drop-shadow-md">
                     </div>
-                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-cyan-300 border border-cyan-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">1. Core Router</span>
+                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-cyan-300 border border-cyan-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">1. Router</span>
                 </div>
                 <div class="cyber-tooltip absolute top-full left-0 sm:left-2 mt-3 w-80 sm:w-96 bg-slate-900/98 border-2 border-cyan-400 rounded-3xl p-5 text-sm space-y-3 backdrop-blur-2xl z-[80] shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
                     <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
                         <span class="font-bold text-cyan-300 text-xs sm:text-sm bg-cyan-950 px-3 py-1 rounded-lg border border-cyan-500/50 uppercase flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-cyan-400"></i> Layer 3: Network</span>
                         <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> ONLINE</span>
                     </div>
-                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">1. Core Gateway Router</h5>
-                    <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 text-xs sm:text-sm">
-                        <div class="flex justify-between text-slate-300"><span>ฮาร์ดแวร์สเปก:</span> <strong class="text-white font-mono font-semibold">Dual 10G SFP+ / 8GB RAM</strong></div>
-                        <div class="flex justify-between text-slate-300"><span>โพรโทคอลที่ใช้:</span> <strong class="text-cyan-300 font-mono font-semibold">BGP, OSPF, IPv4/IPv6, NAT</strong></div>
+                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">1. Router (เราเตอร์เชื่อมต่อเครือข่าย)</h5>
+                    <div class="w-full h-24 sm:h-28 bg-slate-950/80 rounded-2xl border border-cyan-500/30 p-2 flex items-center justify-center overflow-hidden">
+                        <img src="image/eq/Router.png" alt="TP-Link Router" class="max-h-full max-w-full object-contain filter drop-shadow-[0_4px_12px_rgba(0,242,254,0.35)]">
                     </div>
-                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">เชื่อมต่อเครือข่ายภายใน LAN ออกสู่อินเทอร์เน็ต WAN โดยอ่าน Logical IP Address บน Routing Table เพื่อเลือกเส้นทางส่งข้อมูลที่เร็วที่สุด</p>
-                    <div class="p-3 bg-cyan-950/70 rounded-xl border border-cyan-500/40 text-xs sm:text-sm text-cyan-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>ประเด็นสำคัญ:</strong> Router ทำงานที่ Layer 3 ใช้ Logical IP Address ในการส่ง Packet</div>
+                    <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 text-xs sm:text-sm">
+                        <div class="flex justify-between text-slate-300"><span>ประเภทอุปกรณ์:</span> <strong class="text-white font-mono font-semibold">Dual-Band Gigabit Wi-Fi Router</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>โพรโทคอล & ฟังก์ชัน:</span> <strong class="text-cyan-300 font-mono font-semibold">IP Routing, NAT, DHCP, DNS</strong></div>
+                    </div>
+                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">เชื่อมต่อเครือข่ายต่าง Subnet หรือเชื่อมวง LAN ภายในออกสู่อินเทอร์เน็ต WAN โดยอ่าน Logical IP Address บน Routing Table เพื่อเลือกเส้นทางส่งข้อมูล (Packet) ที่เร็วและมีประสิทธิภาพที่สุด</p>
+                    <div class="p-3 bg-cyan-950/70 rounded-xl border border-cyan-500/40 text-xs sm:text-sm text-cyan-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>ประเด็นสำคัญ:</strong> Router ทำงานที่ Layer 3 ใช้ Logical IP Address ในการนำทาง และช่วยแบ่งแยก Broadcast Domain ออกจากกัน</div>
                 </div>
             </div>
 
@@ -204,119 +207,134 @@
             <div class="hotspot-item category-security top-[6%] right-[4%] sm:top-[8%] sm:right-[8%] z-30" id="hotspot-wrap-2" onmouseenter="playChimeSound(true)">
                 <div class="hotspot-node group relative flex flex-col items-center">
                     <span class="animate-ring absolute inset-0 rounded-full bg-rose-400"></span>
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-rose-600 to-pink-500 border-2 border-white text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-xl shadow-rose-500/60">
-                        <i class="fa-solid fa-shield-halved"></i>
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-b from-rose-950/80 via-slate-900/90 to-slate-950 border-2 border-rose-400 text-white flex items-center justify-center p-2 shadow-xl shadow-rose-500/50 backdrop-blur-md">
+                        <img src="image/eq/Firewall.png" alt="Firewall" class="w-full h-full object-contain filter drop-shadow-md">
                     </div>
-                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-rose-300 border border-rose-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">2. Firewall NGFW</span>
+                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-rose-300 border border-rose-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">2. Firewall</span>
                 </div>
                 <div class="cyber-tooltip absolute top-full right-0 sm:right-2 mt-3 w-80 sm:w-96 bg-slate-900/98 border-2 border-rose-400 rounded-3xl p-5 text-sm space-y-3 backdrop-blur-2xl z-[80] shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
                     <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
                         <span class="font-bold text-rose-300 text-xs sm:text-sm bg-rose-950 px-3 py-1 rounded-lg border border-rose-500/50 uppercase flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-rose-400"></i> Layer 4 - 7: Security</span>
                         <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> ACTIVE IPS</span>
                     </div>
-                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">2. Next-Gen Hardware Firewall</h5>
-                    <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 text-xs sm:text-sm">
-                        <div class="flex justify-between text-slate-300"><span>ความเร็วการกรอง:</span> <strong class="text-white font-mono font-semibold">10 Gbps / Zero-Day IPS</strong></div>
-                        <div class="flex justify-between text-slate-300"><span>เทคโนโลยี:</span> <strong class="text-rose-300 font-mono font-semibold">Deep Packet, SSL, VPN</strong></div>
+                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">2. Firewall (ไฟร์วอลล์ความปลอดภัย)</h5>
+                    <div class="w-full h-24 sm:h-28 bg-slate-950/80 rounded-2xl border border-rose-500/30 p-2 flex items-center justify-center overflow-hidden">
+                        <img src="image/eq/Firewall.png" alt="Fortinet Firewall" class="max-h-full max-w-full object-contain filter drop-shadow-[0_4px_12px_rgba(244,63,94,0.35)]">
                     </div>
-                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">ปราการด่านแรกป้องกันภัยคุกคาม กรองทราฟฟิก ดักจับมัลแวร์ ป้องกันการโจมตี DDoS และตรวจจับการแฮกเจาะระบบแบบ Real-time</p>
-                    <div class="p-3 bg-rose-950/70 rounded-xl border border-rose-500/40 text-xs sm:text-sm text-rose-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>จุดเด่น:</strong> NGFW สามารถตรวจจับไวรัสที่ซ่อนลึกถึงระดับ Layer 7 (Application)</div>
+                    <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 text-xs sm:text-sm">
+                        <div class="flex justify-between text-slate-300"><span>ฮาร์ดแวร์สเปก:</span> <strong class="text-white font-mono font-semibold">FortiGate NGFW / Multi-Gigabit</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>ระบบความปลอดภัย:</span> <strong class="text-rose-300 font-mono font-semibold">Deep Packet, SSL, IPS/IDS, VPN</strong></div>
+                    </div>
+                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">ปราการด่านแรกป้องกันภัยคุกคาม กรองทราฟฟิกข้อมูลเข้า-ออกตามนโยบายความปลอดภัย (Security Rules) ดักจับมัลแวร์ ป้องกันการโจมตี DDoS และตรวจจับการแฮกเจาะระบบแบบ Real-time</p>
+                    <div class="p-3 bg-rose-950/70 rounded-xl border border-rose-500/40 text-xs sm:text-sm text-rose-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>จุดเด่น:</strong> Next-Gen Firewall (NGFW) สามารถตรวจจับและวิเคราะห์แพ็กเกจลึกถึงระดับ Layer 7 (Application Layer)</div>
                 </div>
             </div>
 
-            <!-- Hotspot 3: L3 Switch -->
+            <!-- Hotspot 3: Switch -->
             <div class="hotspot-item category-routing top-[44%] left-[2%] sm:top-[44%] sm:left-[4%] z-30" id="hotspot-wrap-3" onmouseenter="playChimeSound(true)">
                 <div class="hotspot-node group relative flex flex-col items-center">
                     <span class="animate-ring absolute inset-0 rounded-full bg-blue-400"></span>
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 border-2 border-white text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-xl shadow-blue-500/60">
-                        <i class="fa-solid fa-network-wired"></i>
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-b from-blue-950/80 via-slate-900/90 to-slate-950 border-2 border-blue-400 text-white flex items-center justify-center p-2 shadow-xl shadow-blue-500/50 backdrop-blur-md">
+                        <img src="image/eq/Switch (สวิตช์).png" onerror="this.src='image/eq/Switch.png'" alt="Switch" class="w-full h-full object-contain filter drop-shadow-md">
                     </div>
-                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-blue-300 border border-blue-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">3. L3 Switch</span>
+                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-blue-300 border border-blue-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">3. Switch</span>
                 </div>
                 <div class="cyber-tooltip absolute top-[-30px] left-full ml-4 w-80 sm:w-96 bg-slate-900/98 border-2 border-blue-400 rounded-3xl p-5 text-sm space-y-3 backdrop-blur-2xl z-[80] shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
                     <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
-                        <span class="font-bold text-blue-300 text-xs sm:text-sm bg-blue-950 px-3 py-1 rounded-lg border border-blue-500/50 uppercase flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-blue-400"></i> Layer 2 - 3: Switch</span>
-                        <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> 48 PORTS UP</span>
+                        <span class="font-bold text-blue-300 text-xs sm:text-sm bg-blue-950 px-3 py-1 rounded-lg border border-blue-500/50 uppercase flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-blue-400"></i> Layer 2: Data Link</span>
+                        <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> 24 PORTS UP</span>
                     </div>
-                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">3. Layer 3 Managed Core Switch</h5>
+                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">3. Switch (สวิตช์รวมสัญญาณ LAN)</h5>
+                    <div class="w-full h-24 sm:h-28 bg-slate-950/80 rounded-2xl border border-blue-500/30 p-2 flex items-center justify-center overflow-hidden">
+                        <img src="image/eq/Switch (สวิตช์).png" onerror="this.src='image/eq/Switch.png'" alt="TP-Link Gigabit Switch" class="max-h-full max-w-full object-contain filter drop-shadow-[0_4px_12px_rgba(59,130,246,0.35)]">
+                    </div>
                     <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 text-xs sm:text-sm">
-                        <div class="flex justify-between text-slate-300"><span>พอร์ตเชื่อมต่อ:</span> <strong class="text-white font-mono font-semibold">48x 1G PoE+ & 4x 10G SFP+</strong></div>
-                        <div class="flex justify-between text-slate-300"><span>ฟีเจอร์เด่น:</span> <strong class="text-blue-300 font-mono font-semibold">VLAN 802.1Q, LACP, STP</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>พอร์ตเชื่อมต่อ:</span> <strong class="text-white font-mono font-semibold">24-Port Gigabit 10/100/1000 Mbps</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>เทคโนโลยีหลัก:</span> <strong class="text-blue-300 font-mono font-semibold">MAC Address Table, Full-Duplex</strong></div>
                     </div>
-                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">สวิตช์จัดการโครงข่ายหลัก รองรับการแบ่ง VLAN แยกแผนกงานเพื่อความปลอดภัย และส่งเฟรมข้อมูลด้วยตาราง MAC Address Table ตรงสู่พอร์ตปลายทาง</p>
-                    <div class="p-3 bg-blue-950/70 rounded-xl border border-blue-500/40 text-xs sm:text-sm text-blue-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>ข้อดี:</strong> ลดปัญหา Broadcast Domain และป้องกันการชนกันของสัญญาณ 100%</div>
+                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">อุปกรณ์รวมสายสัญญาณสำหรับคอมพิวเตอร์ในวง LAN ส่งเฟรมข้อมูลแบบ Unicast ไปยังพอร์ตปลายทางโดยจดจำ Physical MAC Address ลงในตาราง MAC Address Table</p>
+                    <div class="p-3 bg-blue-950/70 rounded-xl border border-blue-500/40 text-xs sm:text-sm text-blue-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>ข้อดีเหนือกว่า Hub:</strong> Switch แยก 1 Collision Domain ต่อ 1 พอร์ต ข้อมูลไม่ชนกัน 100% และรับ-ส่งข้อมูลได้พร้อมกันสองทิศทาง</div>
                 </div>
             </div>
 
-            <!-- Hotspot 4: Patch Panel -->
-            <div class="hotspot-item category-cabling bottom-[6%] left-[4%] sm:bottom-[8%] sm:left-[8%] z-30" id="hotspot-wrap-4" onmouseenter="playChimeSound(true)">
+            <!-- Hotspot 4: Hub -->
+            <div class="hotspot-item category-routing bottom-[6%] left-[4%] sm:bottom-[8%] sm:left-[8%] z-30" id="hotspot-wrap-4" onmouseenter="playChimeSound(true)">
                 <div class="hotspot-node group relative flex flex-col items-center">
                     <span class="animate-ring absolute inset-0 rounded-full bg-amber-400"></span>
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-amber-600 to-orange-500 border-2 border-white text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-xl shadow-amber-500/60">
-                        <i class="fa-solid fa-ethernet"></i>
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-b from-amber-950/80 via-slate-900/90 to-slate-950 border-2 border-amber-400 text-white flex items-center justify-center p-2 shadow-xl shadow-amber-500/50 backdrop-blur-md">
+                        <img src="image/eq/Hub.png" alt="Hub" class="w-full h-full object-contain filter drop-shadow-md">
                     </div>
-                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-amber-300 border border-amber-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">4. Patch Panel</span>
+                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-amber-300 border border-amber-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">4. Hub</span>
                 </div>
                 <div class="cyber-tooltip absolute bottom-full left-0 sm:left-2 mb-3 w-80 sm:w-96 bg-slate-900/98 border-2 border-amber-400 rounded-3xl p-5 text-sm space-y-3 backdrop-blur-2xl z-[80] shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
                     <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
                         <span class="font-bold text-amber-300 text-xs sm:text-sm bg-amber-950 px-3 py-1 rounded-lg border border-amber-500/50 uppercase flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-amber-400"></i> Layer 1: Physical</span>
-                        <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> 10Gbps CAT6A</span>
+                        <span class="text-xs text-rose-400 font-bold flex items-center gap-1.5 font-mono bg-rose-950/60 px-2.5 py-0.5 rounded-full border border-rose-500/40"><span class="w-2.5 h-2.5 rounded-full bg-rose-400 animate-ping"></span> ⚠️ LEGACY HUB</span>
                     </div>
-                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">4. Patch Panel & Structured Cabling</h5>
+                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">4. Hub (ฮับรวมสัญญาณ - เทคโนโลยีเดิม)</h5>
+                    <div class="w-full h-24 sm:h-28 bg-slate-950/80 rounded-2xl border border-amber-500/30 p-2 flex items-center justify-center overflow-hidden">
+                        <img src="image/eq/Hub.png" alt="TP-Link Hub" class="max-h-full max-w-full object-contain filter drop-shadow-[0_4px_12px_rgba(245,158,11,0.35)]">
+                    </div>
                     <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 text-xs sm:text-sm">
-                        <div class="flex justify-between text-slate-300"><span>มาตรฐานสาย:</span> <strong class="text-white font-mono font-semibold">Cat 6A 500MHz Shielded</strong></div>
-                        <div class="flex justify-between text-slate-300"><span>มาตรฐานเข้าสาย:</span> <strong class="text-amber-300 font-mono font-semibold">TIA/EIA-568B, RJ-45</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>ลักษณะการทำงาน:</span> <strong class="text-white font-mono font-semibold">Multiport Repeater / 8-Port</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>การส่งสัญญาณ:</span> <strong class="text-amber-300 font-mono font-semibold">Broadcast ทุกพอร์ต (Half-Duplex)</strong></div>
                     </div>
-                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">แผงกระจายสายแลนจุดรวมการเชื่อมต่อจากทุกห้องเข้าสู่ตู้ Rack ช่วยจัดสายเป็นระเบียบ ซ่อมบำรุงและสลับพอร์ตได้สะดวกรวดเร็ว</p>
-                    <div class="p-3 bg-amber-950/70 rounded-xl border border-amber-500/40 text-xs sm:text-sm text-amber-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>เทคนิคช่าง:</strong> คลายเกลียวคู่สายก่อนเข้าพอร์ตไม่เกิน 1.3 ซม. เพื่อกัน Crosstalk</div>
+                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">อุปกรณ์รวมสัญญาณรุ่นแรก ทำหน้าที่ทวนสัญญาณไฟฟ้าแล้วกระจายออกทุกพอร์ตโดยไม่มีความฉลาด ทุกอุปกรณ์แชร์แบนด์วิดท์ร่วมกัน เกิดปัญหาข้อมูลชนกัน (Collision) บ่อยครั้ง</p>
+                    <div class="p-3 bg-amber-950/70 rounded-xl border border-amber-500/40 text-xs sm:text-sm text-amber-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>ประเด็นสำคัญ:</strong> Hub มีเพียง 1 Collision Domain รวมกันทั้งเครื่อง ปัจจุบันยกเลิกใช้งานและถูกแทนที่ด้วย Switch ทั้งหมด</div>
                 </div>
             </div>
 
-            <!-- Hotspot 5: Wi-Fi 7 -->
-            <div class="hotspot-item category-cabling bottom-[6%] right-[4%] sm:bottom-[8%] sm:right-[8%] z-30" id="hotspot-wrap-5" onmouseenter="playChimeSound(true)">
+            <!-- Hotspot 5: Access Point -->
+            <div class="hotspot-item category-wireless bottom-[6%] right-[4%] sm:bottom-[8%] sm:right-[8%] z-30" id="hotspot-wrap-5" onmouseenter="playChimeSound(true)">
                 <div class="hotspot-node group relative flex flex-col items-center">
                     <span class="animate-ring absolute inset-0 rounded-full bg-emerald-400"></span>
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 border-2 border-white text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-xl shadow-emerald-500/60">
-                        <i class="fa-solid fa-wifi"></i>
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-b from-emerald-950/80 via-slate-900/90 to-slate-950 border-2 border-emerald-400 text-white flex items-center justify-center p-2 shadow-xl shadow-emerald-500/50 backdrop-blur-md">
+                        <img src="image/eq/Access Point.png" onerror="this.src='image/eq/Access-Point.png'" alt="Access Point" class="w-full h-full object-contain filter drop-shadow-md">
                     </div>
-                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-emerald-300 border border-emerald-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">5. Wi-Fi 7 AP</span>
+                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-emerald-300 border border-emerald-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">5. Access Point</span>
                 </div>
                 <div class="cyber-tooltip absolute bottom-full right-0 sm:right-2 mb-3 w-80 sm:w-96 bg-slate-900/98 border-2 border-emerald-400 rounded-3xl p-5 text-sm space-y-3 backdrop-blur-2xl z-[80] shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
                     <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
                         <span class="font-bold text-emerald-300 text-xs sm:text-sm bg-emerald-950 px-3 py-1 rounded-lg border border-emerald-500/50 uppercase flex items-center gap-1.5"><i class="fa-solid fa-wifi text-emerald-400"></i> Layer 1 - 2: Wireless</span>
-                        <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> 9.3 Gbps READY</span>
+                        <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> WI-FI READY</span>
                     </div>
-                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">5. Enterprise Wi-Fi 7 Access Point</h5>
+                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">5. Wireless Access Point (จุดกระจายสัญญาณไร้สาย)</h5>
+                    <div class="w-full h-24 sm:h-28 bg-slate-950/80 rounded-2xl border border-emerald-500/30 p-2 flex items-center justify-center overflow-hidden">
+                        <img src="image/eq/Access Point.png" onerror="this.src='image/eq/Access-Point.png'" alt="TP-Link Omada AP" class="max-h-full max-w-full object-contain filter drop-shadow-[0_4px_12px_rgba(16,185,129,0.35)]">
+                    </div>
                     <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 text-xs sm:text-sm">
-                        <div class="flex justify-between text-slate-300"><span>ย่านความถี่:</span> <strong class="text-white font-mono font-semibold">Tri-Band 2.4/5/6 GHz</strong></div>
-                        <div class="flex justify-between text-slate-300"><span>ความปลอดภัย:</span> <strong class="text-emerald-300 font-mono font-semibold">WPA3, 4x4 MU-MIMO</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>ย่านความถี่ Wi-Fi:</span> <strong class="text-white font-mono font-semibold">Dual-Band 2.4 GHz & 5 GHz</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>ฟังก์ชันเด่น:</span> <strong class="text-emerald-300 font-mono font-semibold">PoE, WPA3, Multi-SSID, Roaming</strong></div>
                     </div>
-                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">จุดกระจายสัญญาณอินเทอร์เน็ตไร้สายสำหรับแล็ปท็อป สมาร์ตโฟน และอุปกรณ์ IoT รองรับผู้ใช้งานหนาแน่นพร้อมกันหลายร้อยเครื่องแบบไร้รอยต่อ</p>
-                    <div class="p-3 bg-emerald-950/70 rounded-xl border border-emerald-500/40 text-xs sm:text-sm text-emerald-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>เทคโนโลยีเด่น:</strong> MLO (Multi-Link Operation) เชื่อมหลายย่านความถี่พร้อมกัน Latency ต่ำกว่า 5ms</div>
+                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">อุปกรณ์ทำหน้าที่เป็นสะพานเชื่อมระหว่างเครือข่ายมีสาย (LAN) เข้ากับสัญญาณไร้สาย (Wi-Fi) ช่วยให้สมาร์ตโฟน แล็ปท็อป และอุปกรณ์ IoT เชื่อมโยงเข้าสู่ระบบเครือข่ายได้อย่างอิสระ</p>
+                    <div class="p-3 bg-emerald-950/70 rounded-xl border border-emerald-500/40 text-xs sm:text-sm text-emerald-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>เทคโนโลยีสำคัญ:</strong> รองรับ PoE (จ่ายไฟผ่านสายแลนเส้นเดียว) ติดตั้งบนฝ้าเพดานได้เรียบร้อย และมีระบบ Fast Roaming ข้ามจุดสัญญาณไม่หลุด</div>
                 </div>
             </div>
 
-            <!-- Hotspot 6: Data Server -->
+            <!-- Hotspot 6: Modem / ONT -->
             <div class="hotspot-item category-security top-[44%] right-[2%] sm:top-[44%] sm:right-[4%] z-30" id="hotspot-wrap-6" onmouseenter="playChimeSound(true)">
                 <div class="hotspot-node group relative flex flex-col items-center">
                     <span class="animate-ring absolute inset-0 rounded-full bg-purple-400"></span>
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 border-2 border-white text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-xl shadow-purple-500/60">
-                        <i class="fa-solid fa-database"></i>
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-b from-purple-950/80 via-slate-900/90 to-slate-950 border-2 border-purple-400 text-white flex items-center justify-center p-2 shadow-xl shadow-purple-500/50 backdrop-blur-md">
+                        <img src="image/eq/Modem ..png" onerror="this.src='image/eq/Modem.png'" alt="Modem ONT" class="w-full h-full object-contain filter drop-shadow-md">
                     </div>
-                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-purple-300 border border-purple-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">6. Data Server</span>
+                    <span class="mt-2 whitespace-nowrap bg-slate-900/95 text-purple-300 border border-purple-500/50 text-xs sm:text-sm font-bold px-3 py-1 rounded-xl shadow-lg">6. Modem (ONT)</span>
                 </div>
                 <div class="cyber-tooltip absolute top-[-30px] right-full mr-4 w-80 sm:w-96 bg-slate-900/98 border-2 border-purple-400 rounded-3xl p-5 text-sm space-y-3 backdrop-blur-2xl z-[80] shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
                     <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
-                        <span class="font-bold text-purple-300 text-xs sm:text-sm bg-purple-950 px-3 py-1 rounded-lg border border-purple-500/50 uppercase flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-purple-400"></i> Layer 7: Application</span>
-                        <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> RAID 10 HEALTHY</span>
+                        <span class="font-bold text-purple-300 text-xs sm:text-sm bg-purple-950 px-3 py-1 rounded-lg border border-purple-500/50 uppercase flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-purple-400"></i> Layer 1: Physical / WAN</span>
+                        <span class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 font-mono bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/40"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> GPON FIBER UP</span>
                     </div>
-                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">6. Data Server & Backup Vault</h5>
+                    <h5 class="text-base sm:text-lg font-black text-white leading-snug">6. Fiber Modem / ONT (โมเด็มไฟเบอร์)</h5>
+                    <div class="w-full h-24 sm:h-28 bg-slate-950/80 rounded-2xl border border-purple-500/30 p-2 flex items-center justify-center overflow-hidden">
+                        <img src="image/eq/Modem ..png" onerror="this.src='image/eq/Modem.png'" alt="Huawei GPON ONT" class="max-h-full max-w-full object-contain filter drop-shadow-[0_4px_12px_rgba(168,85,247,0.35)]">
+                    </div>
                     <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 text-xs sm:text-sm">
-                        <div class="flex justify-between text-slate-300"><span>สเปกประมวลผล:</span> <strong class="text-white font-mono font-semibold">Dual Xeon, 128GB ECC RAM</strong></div>
-                        <div class="flex justify-between text-slate-300"><span>โพรโทคอลบริการ:</span> <strong class="text-purple-300 font-mono font-semibold">HTTPS, SFTP, NFS, SMB 3.0</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>พอร์ตสัญญาณเข้า:</span> <strong class="text-white font-mono font-semibold">GPON Fiber Optic (SC/APC)</strong></div>
+                        <div class="flex justify-between text-slate-300"><span>หน้าที่หลัก:</span> <strong class="text-purple-300 font-mono font-semibold">แปลงสัญญาณแสงเป็นสัญญาณดิจิทัล</strong></div>
                     </div>
-                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">ให้บริการประมวลผล จัดเก็บฐานข้อมูล และสำรองข้อมูลแบบ 3-2-1 Backup ป้องกันความเสียหายจากไวรัสเรียกค่าไถ่ Ransomware</p>
-                    <div class="p-3 bg-purple-950/70 rounded-xl border border-purple-500/40 text-xs sm:text-sm text-purple-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>เสาหลัก CIA:</strong> ข้อ Availability ความพร้อมใช้งาน เกิดจาก RAID และระบบสำรองไฟ UPS</div>
+                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed font-light">อุปกรณ์โมเด็มไฟเบอร์ (Optical Network Terminal) ทำหน้าที่แปลงสัญญาณแสง (Light Pulse) ผ่านสายใยแก้วนำแสงจากผู้ให้บริการอินเทอร์เน็ต (ISP) ให้เป็นสัญญาณไฟฟ้าดิจิทัลก่อนส่งเข้า Firewall และ Router</p>
+                    <div class="p-3 bg-purple-950/70 rounded-xl border border-purple-500/40 text-xs sm:text-sm text-purple-100 font-medium"><i class="fa-solid fa-lightbulb text-amber-400 mr-1.5 text-base"></i> <strong>ข้อสังเกตไฟสถานะ:</strong> ไฟ PON สีเขียวค้างหมายถึงเชื่อมต่อโครงข่าย ISP สำเร็จ หากไฟ LOS สีแดงกะพริบแสดงว่าไม่ได้รับสัญญาณแสงจากสายไฟเบอร์</div>
                 </div>
             </div>
 
