@@ -411,7 +411,7 @@
                         <iframe 
                             id="interactive-yt-frame"
                             class="absolute top-0 left-0 w-full h-full"
-                            src="https://www.youtube.com/embed/7zd0oycQrHA?start=4&enablejsapi=1&rel=0" 
+                            src="https://www.youtube.com/embed/7zd0oycQrHA?start=4&enablejsapi=1&playsinline=1&rel=0" 
                             title="การเข้าหัวสายแลน RJ45ด้วยตัวเองแบบง่ายๆภายใน3นาที" 
                             frameborder="0" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -421,7 +421,7 @@
                     </div>
 
                     <!-- Overlay Checkpoint Modal (Appears over active video) -->
-                    <div id="video-checkpoint-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md p-2 sm:p-4 flex flex-col justify-center items-center text-center hidden z-40 overflow-y-auto transition-all">
+                    <div id="video-checkpoint-modal" style="transform: translateZ(10px);" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md p-2 sm:p-4 flex flex-col justify-center items-center text-center hidden z-50 overflow-y-auto transition-all">
                         <div id="cp-modal-card" class="max-w-md w-full bg-slate-900/98 p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl border-2 border-amber-400 shadow-2xl space-y-2 sm:space-y-2.5 my-auto max-h-full overflow-y-auto">
                             <div class="flex items-center justify-between">
                                 <span id="cp-modal-badge" class="text-[11px] sm:text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40 px-2.5 py-0.5 rounded-full uppercase">
@@ -621,93 +621,219 @@
             { id: 3, triggerTime: 140, triggered: false }  // 2:20 การสอดสาย ย้ำ & เทส
         ];
 
+        // Ensure origin parameter is configured on iframe for Safari WebKit security
+        (function setupIframeSrc() {
+            try {
+                const frame = document.getElementById('interactive-yt-frame');
+                if (frame && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
+                    const myOrigin = encodeURIComponent(window.location.origin);
+                    if (!frame.src.includes('origin=')) {
+                        const sep = frame.src.includes('?') ? '&' : '?';
+                        frame.src += sep + 'origin=' + myOrigin;
+                    }
+                }
+            } catch (e) {}
+        })();
+
+        // Robust command sender supporting both wildcard and target origin
         function sendYTCommand(func, args) {
             const frame = document.getElementById('interactive-yt-frame');
             if (frame && frame.contentWindow) {
-                frame.contentWindow.postMessage(JSON.stringify({
+                const payload = JSON.stringify({
                     event: 'command',
                     func: func,
                     args: args || []
-                }), '*');
+                });
+                try {
+                    frame.contentWindow.postMessage(payload, '*');
+                } catch (e) {}
+                try {
+                    frame.contentWindow.postMessage(payload, 'https://www.youtube.com');
+                } catch (e) {}
             }
         }
 
-        // YouTube IFrame API Callback
-        window.onYouTubeIframeAPIReady = function() {
-            try {
-                ytPlayer = new YT.Player('interactive-yt-frame', {
-                    events: {
-                        'onStateChange': onYTStateChange
-                    }
-                });
-            } catch (e) {
-                console.warn('YouTube API init fallback:', e);
+        function pingYouTube() {
+            const frame = document.getElementById('interactive-yt-frame');
+            if (frame && frame.contentWindow) {
+                try {
+                    frame.contentWindow.postMessage('{"event":"listening","id":1}', '*');
+                } catch (e) {}
+                try {
+                    frame.contentWindow.postMessage('{"event":"listening","id":1}', 'https://www.youtube.com');
+                } catch (e) {}
             }
-        };
+        }
+
+        // Initialize YouTube Player API safely with fallback polling for Safari
+        function initYTPlayer() {
+            if (ytPlayer) return;
+            const frame = document.getElementById('interactive-yt-frame');
+            if (!frame) return;
+
+            if (window.YT && typeof window.YT.Player === 'function') {
+                try {
+                    ytPlayer = new YT.Player('interactive-yt-frame', {
+                        playerVars: {
+                            playsinline: 1,
+                            enablejsapi: 1,
+                            rel: 0
+                        },
+                        events: {
+                            'onReady': onYTPlayerReady,
+                            'onStateChange': onYTStateChange
+                        }
+                    });
+                } catch (e) {
+                    console.warn('YouTube API init fallback:', e);
+                }
+            }
+        }
+
+        function onYTPlayerReady(event) {
+            pingYouTube();
+            sendYTCommand('addEventListener', ['onStateChange']);
+        }
 
         function onYTStateChange(event) {
-            // 1 = PLAYING, 2 = PAUSED, 0 = ENDED
+            // 1 = PLAYING, 2 = PAUSED, 0 = ENDED, 3 = BUFFERING
             if (event.data === 1) {
                 ytIsPlaying = true;
                 ytPlaybackStart = Date.now();
-                startYTWatcher();
-            } else {
+                if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') {
+                    try {
+                        const t = ytPlayer.getCurrentTime();
+                        if (typeof t === 'number' && !isNaN(t) && t > 0) ytCurrentOffset = t;
+                    } catch (e) {}
+                }
+            } else if (event.data === 2 || event.data === 0) {
                 ytIsPlaying = false;
-                stopYTWatcher();
             }
+        }
+
+        // YouTube API standard callback
+        window.onYouTubeIframeAPIReady = function() {
+            initYTPlayer();
+        };
+
+        // Fallback check in case script loaded before callback assignment (Safari race condition fix)
+        if (window.YT && typeof window.YT.Player === 'function') {
+            initYTPlayer();
+        } else {
+            const ytPoll = setInterval(() => {
+                if (window.YT && typeof window.YT.Player === 'function') {
+                    clearInterval(ytPoll);
+                    initYTPlayer();
+                }
+            }, 100);
+            setTimeout(() => clearInterval(ytPoll), 10000);
         }
 
         function playYouTube() {
             ytIsPlaying = true;
             ytPlaybackStart = Date.now();
+            const frame = document.getElementById('interactive-yt-frame');
+            if (frame) frame.style.pointerEvents = 'auto';
+
+            if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+                try { ytPlayer.playVideo(); } catch (e) {}
+            }
             sendYTCommand('playVideo');
-            startYTWatcher();
         }
 
         function pauseYouTube() {
             ytIsPlaying = false;
-            stopYTWatcher();
+
+            // 1. Direct API call if available
+            if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+                try { ytPlayer.pauseVideo(); } catch (e) {}
+            }
+
+            // 2. PostMessage to iframe (* and https://www.youtube.com)
             sendYTCommand('pauseVideo');
+
+            // 3. Multi-pulse safety for Safari WebKit
+            setTimeout(() => {
+                if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+                    try { ytPlayer.pauseVideo(); } catch (e) {}
+                }
+                sendYTCommand('pauseVideo');
+            }, 100);
+
+            setTimeout(() => {
+                if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+                    try { ytPlayer.pauseVideo(); } catch (e) {}
+                }
+                sendYTCommand('pauseVideo');
+            }, 300);
         }
 
         function seekYouTube(seconds) {
             ytCurrentOffset = seconds;
             ytPlaybackStart = Date.now();
+            if (ytPlayer && typeof ytPlayer.seekTo === 'function') {
+                try { ytPlayer.seekTo(seconds, true); } catch (e) {}
+            }
             sendYTCommand('seekTo', [seconds, true]);
             playYouTube();
         }
 
-        function startYTWatcher() {
-            stopYTWatcher();
-            // Ping YouTube to listen for infoDelivery events
-            sendYTCommand('addEventListener', ['onStateChange']);
-            const frame = document.getElementById('interactive-yt-frame');
-            if (frame && frame.contentWindow) {
-                frame.contentWindow.postMessage('{"event":"listening","id":1}', '*');
-            }
-
-            ytWatcherInterval = setInterval(() => {
-                let curTime = null;
-                if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') {
-                    try {
-                        const t = ytPlayer.getCurrentTime();
-                        if (typeof t === 'number' && !isNaN(t) && t > 0) curTime = t;
-                    } catch (e) {}
-                }
-                // Fallback time estimate if direct API method not permitted by cross-origin
-                if (curTime === null && ytIsPlaying) {
-                    curTime = ytCurrentOffset + (Date.now() - ytPlaybackStart) / 1000;
-                }
-                if (curTime !== null) {
-                    checkVideoTimestamp(curTime);
-                }
-            }, 250);
+        // Continuous Watcher (Heartbeat): Runs every 250ms to monitor playback and enforce checkpoints
+        function startContinuousWatcher() {
+            if (ytWatcherInterval) clearInterval(ytWatcherInterval);
+            ytWatcherInterval = setInterval(watcherTick, 250);
         }
 
-        function stopYTWatcher() {
-            if (ytWatcherInterval) {
-                clearInterval(ytWatcherInterval);
-                ytWatcherInterval = null;
+        function watcherTick() {
+            if (isSimMode) return;
+
+            const modal = document.getElementById('video-checkpoint-modal');
+            const isModalOpen = modal && !modal.classList.contains('hidden');
+
+            // While checkpoint modal is open, ensure video is completely paused
+            if (isModalOpen) {
+                if (ytIsPlaying) {
+                    pauseYouTube();
+                }
+                return;
+            }
+
+            // Query player state and currentTime directly from ytPlayer
+            let directTime = null;
+            if (ytPlayer) {
+                try {
+                    if (typeof ytPlayer.getPlayerState === 'function') {
+                        const st = ytPlayer.getPlayerState();
+                        if (st === 1) {
+                            ytIsPlaying = true;
+                        } else if (st === 2 || st === 0) {
+                            ytIsPlaying = false;
+                        }
+                    }
+                    if (typeof ytPlayer.getCurrentTime === 'function') {
+                        const t = ytPlayer.getCurrentTime();
+                        if (typeof t === 'number' && !isNaN(t) && t > 0) {
+                            directTime = t;
+                            ytCurrentOffset = t;
+                            ytPlaybackStart = Date.now();
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            // Ping YouTube to ensure postMessage events keep firing
+            pingYouTube();
+
+            // Determine current playback position
+            let checkTime = null;
+            if (directTime !== null) {
+                checkTime = directTime;
+            } else if (ytIsPlaying) {
+                checkTime = ytCurrentOffset + (Date.now() - ytPlaybackStart) / 1000;
+            }
+
+            if (checkTime !== null && checkTime > 0) {
+                checkVideoTimestamp(checkTime);
             }
         }
 
@@ -716,11 +842,14 @@
 
             // Don't trigger if modal is already open
             const modal = document.getElementById('video-checkpoint-modal');
-            if (modal && !modal.classList.contains('hidden')) return;
+            if (modal && !modal.classList.contains('hidden')) {
+                pauseYouTube();
+                return;
+            }
 
             ytCheckpoints.forEach(cp => {
-                // If video reaches the target second (within a 2.5s window) and hasn't been triggered yet
-                if (curTime >= cp.triggerTime && curTime < (cp.triggerTime + 2.5) && !cp.triggered) {
+                // If video reaches the checkpoint time (with 5-second window for Safari timer throttling)
+                if (curTime >= cp.triggerTime && curTime < (cp.triggerTime + 5.0) && !cp.triggered) {
                     cp.triggered = true;
                     ytCurrentOffset = curTime;
                     pauseYouTube();
@@ -728,7 +857,7 @@
                     showToast('⚡ วิดีโอถึงจุดตรวจความรู้! ตอบคำถามเพื่อดูคลิปต่อ');
                 }
                 // Allow re-trigger if user rewinds back before checkpoint
-                if (curTime < cp.triggerTime - 8) {
+                if (curTime < cp.triggerTime - 6) {
                     cp.triggered = false;
                 }
             });
@@ -748,24 +877,35 @@
                     }
                     if (data.info.playerState === 1) {
                         ytIsPlaying = true;
-                        startYTWatcher();
                     } else if (data.info.playerState === 2 || data.info.playerState === 0) {
                         ytIsPlaying = false;
-                        stopYTWatcher();
                     }
                 }
 
                 if (data.event === 'onStateChange') {
                     if (data.info === 1) {
                         ytIsPlaying = true;
-                        startYTWatcher();
-                    } else {
+                    } else if (data.info === 2 || data.info === 0) {
                         ytIsPlaying = false;
-                        stopYTWatcher();
                     }
                 }
             } catch (err) {}
         });
+
+        // Safari Click/Tap Detection inside YouTube Iframe
+        window.addEventListener('blur', function() {
+            setTimeout(function() {
+                const frame = document.getElementById('interactive-yt-frame');
+                if (document.activeElement === frame && !isSimMode) {
+                    ytIsPlaying = true;
+                    ytPlaybackStart = Date.now();
+                    pingYouTube();
+                }
+            }, 150);
+        });
+
+        // Start watcher immediately
+        startContinuousWatcher();
 
         function toggleVideoMode() {
             isSimMode = !isSimMode;
@@ -796,7 +936,10 @@
                 setTimeout(() => {
                     pauseYouTube();
                     triggerCheckpoint(cpId);
-                }, 500);
+                }, 350);
+                setTimeout(() => {
+                    pauseYouTube();
+                }, 700);
             } else {
                 const stepMap = { 1: 0, 2: 2, 3: 5 };
                 jumpToNarrationStep(stepMap[cpId] || 0);
@@ -877,9 +1020,30 @@
             const thaiVoice = voices.find(v => v.lang.startsWith('th') || v.lang.includes('TH'));
             if (thaiVoice) utter.voice = thaiVoice;
             window.__activeSpeechUtterance = utter;
-            utter.onend = () => { if (onDone) onDone(); };
-            utter.onerror = () => { if (onDone) onDone(); };
-            window.speechSynthesis.speak(utter);
+
+            let finished = false;
+            const safeDone = () => {
+                if (finished) return;
+                finished = true;
+                clearTimeout(safariWatchdog);
+                if (onDone) onDone();
+            };
+
+            utter.onend = safeDone;
+            utter.onerror = safeDone;
+
+            // Safari watchdog: estimate speech duration based on character count
+            const estMs = Math.max(4000, (text.length * 120) + 2500);
+            const safariWatchdog = setTimeout(() => {
+                console.warn('Safari WebSpeech watchdog timeout fired');
+                safeDone();
+            }, estMs);
+
+            try {
+                window.speechSynthesis.speak(utter);
+            } catch (e) {
+                safeDone();
+            }
         }
 
         // Play a single text with Google TTS, calls onDone when finished
@@ -1182,7 +1346,10 @@
         }
 
         function resumeVideoAfterCheckpoint() {
-            document.getElementById('video-checkpoint-modal').classList.add('hidden');
+            const modal = document.getElementById('video-checkpoint-modal');
+            if (modal) modal.classList.add('hidden');
+            const frame = document.getElementById('interactive-yt-frame');
+            if (frame) frame.style.pointerEvents = 'auto';
             showToast("รับชมวิดีโอต่อได้เลยครับ!");
             if (isSimMode) {
                 currentStepIndex++;
@@ -1280,6 +1447,8 @@
         function triggerCheckpoint(cpId) {
             if (!isSimMode) {
                 pauseYouTube();
+                const frame = document.getElementById('interactive-yt-frame');
+                if (frame) frame.style.pointerEvents = 'none';
             }
             const data = checkpointData[cpId];
             if (!data) return;
